@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#2d89ef"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="fill_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:theme="@style/ToolbarColoredBackArrow" />
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            tools:context="com.example.mridul_xpetize.test.TaskActivity">
+
+
+            <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_details"
+                layout_height="wrap_content"
+                layout_width="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                card_view:cardCornerRadius="5dp"
+                card_view:cardElevation="2dp"
+                card_view:contentPadding="16dp">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/desc"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="Description" />
+
+                    <TextView
+                        android:id="@+id/type"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="Type of task :" />
+
+                    <TextView
+                        android:id="@+id/start"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="Start Date" />
+
+                    <TextView
+                        android:id="@+id/end"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="End Date" />
+
+                    <TextView
+                        android:id="@+id/location"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="Location" />
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_tasks"
+                layout_height="wrap_content"
+                layout_width="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/button_approve"
+                android:layout_below="@+id/card_details"
+                android:layout_marginTop="5dp"
+                card_view:cardCornerRadius="5dp"
+                card_view:cardElevation="2dp"
+                card_view:contentPadding="16dp">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/button_approve"
+                    android:orientation="vertical">
+
+                    <ListView
+                        android:id="@+id/listView_check"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_below="@+id/description" />
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <Button
+                android:id="@+id/button_approve"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_toEndOf="@+id/view"
+                android:layout_toRightOf="@+id/view"
+                android:text="Approve" />
+
+            <View
+                android:id="@+id/view"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_alignTop="@+id/button_approve"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="9dp" />
+
+            <Button
+                android:id="@+id/button_reject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_toLeftOf="@+id/view"
+                android:layout_toStartOf="@+id/view"
+                android:text="Reject" />
+
+        </RelativeLayout>
+    </LinearLayout>
+</ScrollView>
