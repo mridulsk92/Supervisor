@@ -126,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
                 pDialog.dismiss();
 
             if (response == 200) {
-                Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                Intent i = new Intent(LoginActivity.this, DashboardActivity.class);
                 startActivity(i);
             } else {
                 Toast.makeText(LoginActivity.this, "Please Check Username and Password", Toast.LENGTH_SHORT).show();

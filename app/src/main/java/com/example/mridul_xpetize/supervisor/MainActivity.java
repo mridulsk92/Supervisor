@@ -339,25 +339,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
+
         //inflate menu
         getMenuInflater().inflate(R.menu.menu_my, menu);
 
         // Get the notifications MenuItem and LayerDrawable (layer-list)
-        MenuItem item = menu.findItem(R.id.action_notifications);
-//        LayerDrawable icon = (LayerDrawable) item.getIcon();
-
-        // Update LayerDrawable's BadgeDrawable
-//        Utils2.setBadgeCount(this, icon, 2);
-
-        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-
-                Intent i = new Intent(MainActivity.this, NotificationActivity.class);
-                startActivity(i);
-                return false;
-            }
-        });
+//        MenuItem item = menu.findItem(R.id.action_notifications);
+////        LayerDrawable icon = (LayerDrawable) item.getIcon();
+//
+//        // Update LayerDrawable's BadgeDrawable
+////        Utils2.setBadgeCount(this, icon, 2);
+//
+//        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//
+//                Intent i = new Intent(MainActivity.this, NotificationActivity.class);
+//                startActivity(i);
+//                return false;
+//            }
+//        });
 
         return true;
     }
@@ -385,13 +386,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        //handle the back press :D close the drawer first and if the drawer is closed close the activity
-//        if (result != null && result.isDrawerOpen()) {
-//            result.closeDrawer();
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
 }
