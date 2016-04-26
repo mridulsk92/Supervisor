@@ -154,7 +154,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
             contact.put(TAG_CHECK, "subtask1");
             taskList.add(contact);
 
-            HashMap<String, String> temp = new HashMap<String, String>();
+             HashMap<String, String> temp = new HashMap<String, String>();
             temp.put(TAG_CHECK, "subtask2");
             taskList.add(temp);
 //                    }

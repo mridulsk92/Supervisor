@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.LayerDrawable;
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,7 +53,7 @@ public class InspectorActivity extends AppCompatActivity {
     TextView inspector;
     ListView added_list;
     private Drawer result = null;
-    ImageButton add_task, startCal, endCal;
+    ImageButton  startCal, endCal;
     ArrayList<String> spinnerData = new ArrayList<String>();
     Calendar myCalendarS, myCalendarE;
     EditText startDate, endDate;
@@ -68,7 +70,6 @@ public class InspectorActivity extends AppCompatActivity {
     private static String TAG_PRIORITY = "TaskPriority";
 
     ArrayList<HashMap<String, String>> dataList;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +98,13 @@ public class InspectorActivity extends AppCompatActivity {
                 .withDisplayBelowStatusBar(true)
                 .addDrawerItems(
                         new SecondaryDrawerItem().withName("About").withIcon(getResources().getDrawable(R.drawable.ic_about)).withSelectable(false),
-                        new SecondaryDrawerItem().withName("Log Out").withIcon(getResources().getDrawable(R.drawable.ic_logout)).withSelectable(false)
+                        new SecondaryDrawerItem().withName("Log Out").withIcon(getResources().getDrawable(R.drawable.ic_logout)).withSelectable(false),
+                        new SectionDrawerItem().withName("Filter"),
+                        new SecondaryDrawerItem().withName("New Task").withIcon(getResources().getDrawable(R.drawable.ic_filter)).withSelectable(false),
+                        new SecondaryDrawerItem().withName("Old Task").withIcon(getResources().getDrawable(R.drawable.ic_filter)).withSelectable(false),
+                        new SecondaryDrawerItem().withName("High Priority").withIcon(getResources().getDrawable(R.drawable.ic_filter)).withSelectable(false),
+                        new SecondaryDrawerItem().withName("Medium Priority").withIcon(getResources().getDrawable(R.drawable.ic_filter)).withSelectable(false),
+                        new SecondaryDrawerItem().withName("Low Priority").withIcon(getResources().getDrawable(R.drawable.ic_filter)).withSelectable(false)
                 ).build();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -107,7 +114,6 @@ public class InspectorActivity extends AppCompatActivity {
         added_list = (ListView) findViewById(R.id.listView_task);
         dataList = new ArrayList<HashMap<String, String>>();
         inspector = (TextView) findViewById(R.id.textView_inspector);
-        add_task = (ImageButton) findViewById(R.id.imageButton_add);
 
         //Get Inspector name and display it
         Intent i = getIntent();
@@ -115,16 +121,17 @@ public class InspectorActivity extends AppCompatActivity {
         String name = i.getStringExtra("name");
         inspector.setText(name);
 
-        //onClick of image button
-        add_task.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        new GetTaskList().execute();
 
-                AddTask();
+        //onClick of Floating Button
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Click action
+               AddTask();
             }
         });
-
-        new GetTaskList().execute();
     }
 
     private void AddTask() {

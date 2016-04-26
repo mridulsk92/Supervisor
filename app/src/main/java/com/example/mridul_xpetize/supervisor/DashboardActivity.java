@@ -79,6 +79,7 @@ public class DashboardActivity extends AppCompatActivity {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Confirm");
         alertDialogBuilder.setMessage("Do You Want to Log Out ?");
+
         alertDialogBuilder.setPositiveButton("Yes",
                 new DialogInterface.OnClickListener() {
 
@@ -103,5 +104,4 @@ public class DashboardActivity extends AppCompatActivity {
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
-
 }
