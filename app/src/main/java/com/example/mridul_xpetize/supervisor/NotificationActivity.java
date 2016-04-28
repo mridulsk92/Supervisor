@@ -44,22 +44,28 @@ public class NotificationActivity extends AppCompatActivity {
     private static String TAG_INSPECTOR = "insp";
     ArrayList<HashMap<String, String>> dataList;
     ListView inspector_list;
+    PreferencesHelper pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
 
+        //Initialise toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Notification");
         toolbar.setTitleTextColor(Color.WHITE);
 
+        pref = new PreferencesHelper(NotificationActivity.this);
+        String acc_name = pref.GetPreferences("Name");
+
+        //Side Drawer
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName("Supervisor1").withEmail("supervisor1@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
+                        new ProfileDrawerItem().withName(acc_name).withEmail(acc_name+"@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
                 ).build();
 
         result = new DrawerBuilder()

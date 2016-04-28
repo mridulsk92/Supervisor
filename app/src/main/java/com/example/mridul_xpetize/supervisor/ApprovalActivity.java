@@ -43,6 +43,7 @@ public class ApprovalActivity extends AppCompatActivity {
     TextView desc, type, loc, start, end;
     Button approve, reject;
     List<String> paramList = new ArrayList<String>();
+    PreferencesHelper pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +55,15 @@ public class ApprovalActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
 
+        pref = new PreferencesHelper(ApprovalActivity.this);
+        String name = pref.GetPreferences("Name");
+
         //Adding Header to the Navigation Drawer
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName("Supervisor1").withEmail("supervisor1@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
+                        new ProfileDrawerItem().withName(name).withEmail(name+"@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
                 ).build();
 
         //Drawer

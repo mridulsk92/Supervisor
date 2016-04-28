@@ -64,6 +64,7 @@ public class InspectorActivity extends AppCompatActivity {
     String desc, stdate, enddate;
     int priority;
     JSONArray tasks;
+    PreferencesHelper pref;
 
     private static String TAG_DESCRIPTION = "Description";
     private static String TAG_ID = "Id";
@@ -87,12 +88,15 @@ public class InspectorActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
 
+        pref = new PreferencesHelper(InspectorActivity.this);
+        String acc_name = pref.GetPreferences("Name");
+
         //Add header to navigation drawer
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName("Supervisor1").withEmail("supervisor1@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
+                        new ProfileDrawerItem().withName(acc_name).withEmail(acc_name+"@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
                 ).build();
 
         //Drawer
