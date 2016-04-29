@@ -64,6 +64,7 @@
         android:id="@+id/imageButton_notification"
         android:src="@drawable/notification_ic"
         android:background="@null"
+        android:layout_below="@+id/textView2"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -86,6 +87,7 @@
         android:id="@+id/imageButton_logout"
         android:src="@drawable/logout_ic"
         android:background="@null"
+        android:layout_below="@+id/textView4"
         android:layout_alignTop="@+id/imageButton_notification"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
