@@ -106,7 +106,6 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-
     }
 
     //AsyncTask to get SubTasks(to be edited)

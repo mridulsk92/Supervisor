@@ -37,7 +37,13 @@ public class NotificationActivity extends AppCompatActivity {
     ProgressDialog pDialog;
     private Drawer result = null;
 
-    private static String TAG_NAME = "Name";
+    private static String TAG_TASKID = "TaskId";
+    private static String TAG_DESCRIPTION = "Description";
+    private static String TAG_STARTDATE = "TaskStartDate";
+    private static String TAG_ENDDATE = "TaskEndDate";
+    private static String TAG_STATUS = "Status";
+
+    private static String TAG_USERNAME = "Username";
     private static String TAG_ID = "Id";
     JSONArray tasks;
 
@@ -45,6 +51,7 @@ public class NotificationActivity extends AppCompatActivity {
     ArrayList<HashMap<String, String>> dataList;
     ListView inspector_list;
     PreferencesHelper pref;
+    String statusString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,24 +94,25 @@ public class NotificationActivity extends AppCompatActivity {
         dataList = new ArrayList<HashMap<String, String>>();
 
         //Get Inspector List
-        new GetInspectorList().execute();
+//        new GetInspectorList().execute();
+        new GetTaskList().execute();
 
         //onItem click listener for list items
         inspector_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                String name = ((TextView) view.findViewById(R.id.inspector)).getText().toString();
+                String taskid = ((TextView) view.findViewById(R.id.task_id)).getText().toString();
 
                 Intent i = new Intent(NotificationActivity.this, ApprovalActivity.class);
-                i.putExtra("name", name);
+                i.putExtra("id", taskid);
                 startActivity(i);
             }
         });
     }
 
-    //AsyncTask to get rejected tasks(to be edited)
-    private class GetInspectorList extends AsyncTask<Void, Void, Void> {
+    //AsyncTask to get tasks(to be edited)
+    private class GetTaskList extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -122,31 +130,42 @@ public class NotificationActivity extends AppCompatActivity {
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
 
-            String url = "http://vikray.in/MyService.asmx/GetUserDetails?userid=0";
-
+            String url = "http://vikray.in/MyService.asmx/ExcProcedure?Para=Proc_GetCompTsk&Para=" + 2;
             // Making a request to url and getting response
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
 
             Log.d("Response: ", "> " + jsonStr);
 
             if (jsonStr != null) {
+
                 try {
 
                     tasks = new JSONArray(jsonStr);
+
                     // looping through All Contacts
                     for (int i = 0; i < tasks.length(); i++) {
-
                         JSONObject c = tasks.getJSONObject(i);
 
                         String id = c.getString(TAG_ID);
-                        String name = c.getString(TAG_NAME);
+                        String taskID = c.getString(TAG_TASKID);
+                        String username = c.getString(TAG_USERNAME);
+                        String start_og = c.getString(TAG_STARTDATE);
+                        String end_og = c.getString(TAG_ENDDATE);
+                        int status = c.getInt(TAG_STATUS);
+                        if (status == 0) {
+                            statusString = "Pending Approval";
+                        }
 
                         // tmp hashmap for single contact
                         HashMap<String, String> contact = new HashMap<String, String>();
 
                         // adding each child node to HashMap key => value
-                        contact.put(TAG_INSPECTOR, name);
-                        contact.put(TAG_ID,id);
+                        contact.put(TAG_USERNAME, "Username : " + username);
+                        contact.put(TAG_ID, id);
+                        contact.put(TAG_TASKID, taskID);
+                        contact.put(TAG_STARTDATE, "Start Date : " + start_og);
+                        contact.put(TAG_ENDDATE, "End Date : " + end_og);
+                        contact.put(TAG_STATUS, "Status : " + statusString);
                         dataList.add(contact);
 
                     }
@@ -163,18 +182,23 @@ public class NotificationActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-
             // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();
 
             ListAdapter adapter = new SimpleAdapter(
                     NotificationActivity.this, dataList,
-                    R.layout.layout_inspector, new String[]{TAG_INSPECTOR, TAG_ID}, new int[]{R.id.inspector,R.id.inspector_id
-            });
+                    R.layout.task_list, new String[]{TAG_USERNAME, TAG_ID, TAG_TASKID, TAG_STARTDATE, TAG_ENDDATE, TAG_STATUS},
+                    new int[]{R.id.username, R.id.id, R.id.task_id, R.id.start, R.id.end, R.id.status});
 
             inspector_list.setAdapter(adapter);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        super.finish();
     }
 
     @Override

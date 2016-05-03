@@ -44,6 +44,7 @@ public class ApprovalActivity extends AppCompatActivity {
     Button approve, reject;
     List<String> paramList = new ArrayList<String>();
     PreferencesHelper pref;
+    String taskId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +56,14 @@ public class ApprovalActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
 
+        //get preference
         pref = new PreferencesHelper(ApprovalActivity.this);
         String name = pref.GetPreferences("Name");
 
+        //get intent
+        Intent i = getIntent();
+        taskId = i.getStringExtra("id");
+        
         //Adding Header to the Navigation Drawer
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -113,7 +119,7 @@ public class ApprovalActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                new PostTask().execute();
+                new ApproveTask().execute();
             }
         });
 
@@ -122,6 +128,7 @@ public class ApprovalActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                new RejectTask().execute();
             }
         });
     }
@@ -210,14 +217,13 @@ public class ApprovalActivity extends AppCompatActivity {
         }
     }
 
-    private class PostTask extends AsyncTask<Void, Void, Void> {
+    //AsyncTask to approve tasks(to be edited)
+    private class ApproveTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-            paramList.add("mridul");
-            paramList.add("ajay");
+            // Showing progress dialog
             pDialog = new ProgressDialog(ApprovalActivity.this);
             pDialog.setMessage("Please wait...");
             pDialog.setCancelable(false);
@@ -225,27 +231,76 @@ public class ApprovalActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
-
-            String url = "http://vikray.in/MyService.asmx/PostEmployessJSONNewNN";
-//            String url = "http://requestb.in/13ae0821";
-            List<NameValuePair> paramse = new ArrayList<NameValuePair>();
-            for (int i = 0; i < paramList.size(); i++) {
-                paramse.add(new BasicNameValuePair("name", paramList.get(i)));
-            }
+        protected Void doInBackground(Void... arg0) {
+            // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
-            String res = sh.makeServiceCall(url, ServiceHandler.POST, paramse);
-            Log.d("Response", res);
+
+            String url = "http://vikray.in/MyService.asmx/ExcProcedure?Para=Proc_ApproveTsk&Para=" + taskId;
+            Log.d("url",url);
+            // Making a request to url and getting response
+            String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
+
+            Log.d("Response: ", "> " + jsonStr);
+
             return null;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();
+
+            Intent i = new Intent(ApprovalActivity.this, NotificationActivity.class);
+            startActivity(i);
         }
+    }
+
+    //AsyncTask to reject tasks(to be edited)
+    private class RejectTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(ApprovalActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            // Creating service handler class instance
+            ServiceHandler sh = new ServiceHandler();
+
+            String url = "http://vikray.in/MyService.asmx/ExcProcedure?Para=Proc_RejectTsk&Para=" + taskId;
+            Log.d("url",url);
+            // Making a request to url and getting response
+            String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
+
+            Log.d("Response: ", "> " + jsonStr);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            Intent i = new Intent(ApprovalActivity.this, NotificationActivity.class);
+            startActivity(i);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        super.finish();
     }
 
     @Override
