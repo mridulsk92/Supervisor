@@ -82,8 +82,11 @@ public class LoginActivity extends AppCompatActivity {
             ServiceHandler sh = new ServiceHandler();
 
             String designation = pref.GetPreferences("Designation");
-            String url = "http://vikray.in/MyService.asmx/ExcProcedure?Para=Proc_ChkLogin&Para=" + username_st + "&Para=" + password_st+"&Para="+designation;
+//            String url = "http://vikray.in/MyService.asmx/ExcProcedure?Para=Proc_ChkLogin&Para=" + username_st + "&Para=" + password_st+"&Para="+designation;
 
+            String url = getString(R.string.url)+"MyService.asmx/ExcProcedure?Para=Proc_ChkLogin&Para=" + username_st + "&Para=" + password_st+"&Para="+designation;
+
+            Log.d("url",url);
             // Making a request to url and getting response
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
             Log.d("Response: ", "> " + jsonStr);
@@ -102,12 +105,12 @@ public class LoginActivity extends AppCompatActivity {
                         String username = c.getString(TAG_USERNAME);
 
                         if (username.equals(username_st)) {
+
                             response = 200;
                             pref.SavePreferences("User Id", id);
                             pref.SavePreferences("Name", name);
                             pref.SavePreferences("User Name", username);
                         }
-
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

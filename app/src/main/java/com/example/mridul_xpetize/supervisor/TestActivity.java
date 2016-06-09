@@ -91,7 +91,7 @@ public class TestActivity extends AppCompatActivity {
             ServiceHandler sh = new ServiceHandler();
 
 //            String url = "http://vikray.in/MyService.asmx/GetEmployessJSONNewN";
-            String url = "http://vikray.in/MyService.asmx/InsertUserDetails?Name="+name_st+"&Designation="+desig_st+"&location="+loc_st+"&username="+username_st+"&password="+pass_st+"&createdby="+create_st;
+            String url = getString(R.string.url)+"MyService.asmx/InsertUserDetails?Name="+name_st+"&Designation="+desig_st+"&location="+loc_st+"&username="+username_st+"&password="+pass_st+"&createdby="+create_st;
             // Making a request to url and getting response
 
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);

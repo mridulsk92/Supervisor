@@ -3,6 +3,7 @@ package com.example.mridul_xpetize.supervisor;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.LayerDrawable;
@@ -188,8 +189,30 @@ public class InspectorActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Click action
-                AddTask();
+
+                CharSequence options[] = new CharSequence[] {"Select Existing Tasks", "Create New Task"};
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(InspectorActivity.this);
+                builder.setTitle("Select");
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // the user clicked on options[which]
+                        if (which == 0) {
+                            //Code for Existing Tasks
+                        } else {
+                            AddTask();
+                        }
+                    }
+                });
+                builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        //Cancel Dialog
+                    }
+                });
+                builder.show();
             }
         });
     }
@@ -208,7 +231,7 @@ public class InspectorActivity extends AppCompatActivity {
         myCalendarS = Calendar.getInstance();
         myCalendarE = Calendar.getInstance();
         final EditText editDescription = (EditText) addView.findViewById(R.id.editText_desc);
-        final Spinner typeSpinner = (Spinner) addView.findViewById(R.id.spinner_type);
+        final Spinner typeSpinner = (Spinner) addView.findViewById(R.id.spinner);
         startDate = (EditText) addView.findViewById(R.id.editText_start);
         endDate = (EditText) addView.findViewById(R.id.editText_end);
         final EditText loc = (EditText) addView.findViewById(R.id.editText_location);
@@ -302,13 +325,7 @@ public class InspectorActivity extends AppCompatActivity {
         // attaching data adapter to spinner
         typeSpinner.setAdapter(dataAdapter);
 
-//            if(typeSpinner.getSelectedItemPosition() == 0){
-//                //Do Nothing
-//            }else{
-//                String type_selected = typeSpinner.getSelectedItem().toString();
-//            }
         addDialog.show();
-
     }
 
     private class PostTasks extends AsyncTask<Void, Void, Void> {
@@ -330,7 +347,7 @@ public class InspectorActivity extends AppCompatActivity {
 
             Log.d("test", String.valueOf(priority));
 //            String url = "http://vikray.in/MyService.asmx/GetEmployessJSONNewN";
-            String url = "http://vikray.in/MyService.asmx/ExcProcedure?Para=Proc_InsertTaskMst&Para=" + desc + "&Para=" + insp_id + "&Para=2&Para=" + stdate + "&Para=" + enddate + "&Para=" + 3 + "&Para=" + priority + "&Para=" + 2;
+            String url = getString(R.string.url)+"MyService.asmx/ExcProcedure?Para=Proc_InsertTaskMst&Para=" + desc + "&Para=" + insp_id + "&Para=2&Para=" + stdate + "&Para=" + enddate + "&Para=" + 3 + "&Para=" + priority + "&Para=" + 2;
             // Making a request to url and getting response
 
             Log.d("Test", url);
@@ -373,7 +390,7 @@ public class InspectorActivity extends AppCompatActivity {
             ServiceHandler sh = new ServiceHandler();
 
 //            String url = "http://vikray.in/MyService.asmx/GetEmployessJSONNewN";
-            String url = "http://vikray.in/MyService.asmx/ExcProcedure?Para=Proc_GetTaskMst&Para=" + insp_id;
+            String url = getString(R.string.url)+"MyService.asmx/ExcProcedure?Para=Proc_GetTaskMst&Para=" + insp_id;
             // Making a request to url and getting response
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
 
