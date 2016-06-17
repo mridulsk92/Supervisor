@@ -66,21 +66,14 @@ public class MainActivity extends AppCompatActivity {
 
     private Drawer result = null;
     ProgressDialog pDialog;
-    private static String TAG_INSPECTOR = "insp";
     ArrayList<HashMap<String, String>> dataList;
     ListView inspector_list;
-    AutoCompleteTextView autoText;
     JSONArray tasks;
-    private static String TAG_NAME = "Name";
-    private static String TAG_ID = "Id";
+    private static String TAG_NAME = "UserName";
+    private static String TAG_ID = "UserId";
     Button add;
     String del_id;
     PreferencesHelper pref;
-
-    List<String> dbListName = new ArrayList<String>();
-    List<String> dbListId = new ArrayList<String>();
-    List<String> savedList = new ArrayList<String>();
-    List<String> savedListId = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitleTextColor(Color.WHITE);
 
         pref = new PreferencesHelper(MainActivity.this);
-        String name = pref.GetPreferences("Name");
+        String name = pref.GetPreferences("UserName");
 
         //Side Drawer
         AccountHeader headerResult = new AccountHeaderBuilder()
@@ -112,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
                 .withSelectedItem(-1)
                 .withDisplayBelowStatusBar(true)
                 .addDrawerItems(
-//                        new PrimaryDrawerItem().withName("Filter").withIcon(getResources().getDrawable(R.drawable.ic_filter)).withIdentifier(1).withSelectable(false),
                         new SecondaryDrawerItem().withName("About").withIcon(getResources().getDrawable(R.drawable.ic_about)).withSelectable(false),
                         new SecondaryDrawerItem().withName("Log Out").withIcon(getResources().getDrawable(R.drawable.ic_logout)).withSelectable(false)
                 ).build();
@@ -126,35 +118,7 @@ public class MainActivity extends AppCompatActivity {
         dataList = new ArrayList<HashMap<String, String>>();
         pref = new PreferencesHelper(MainActivity.this);
 
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent i = new Intent(MainActivity.this, TestActivity.class);
-                startActivity(i);
-            }
-        });
-
-//        if (isNetworkAvailable() && !savedList.isEmpty()) {
-//            new GetInspectorList().execute();
-//        } else {
-//            GetSavedInspectorList();
-//        }
         new GetInspectorList().execute();
-
-        //long click on list item
-        inspector_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                TextView ins_id = (TextView) view.findViewById(R.id.inspector_id);
-                del_id = ins_id.getText().toString();
-                Log.d("test",del_id);
-                ShowDialog();
-
-                return true;
-            }
-        });
 
         //onItem click listener for list items
         inspector_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -172,92 +136,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void ShowDialog() {
-
-        LayoutInflater factory = LayoutInflater.from(this);
-        final View addView = factory.inflate(
-                R.layout.layout_dialog, null);
-        final AlertDialog addDialog = new AlertDialog.Builder(this).create();
-        addDialog.setView(addView);
-
-        //Initialise
-        TextView delete = (TextView) addView.findViewById(R.id.textView_delete);
-        delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                new DeleteUser().execute();
-                addDialog.dismiss();
-            }
-        });
-        addDialog.show();
-    }
-
-    private class DeleteUser extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Showing progress dialog
-            pDialog = new ProgressDialog(MainActivity.this);
-            pDialog.setMessage("Please wait...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-        }
-
-        @Override
-        protected Void doInBackground(Void... arg0) {
-            // Creating service handler class instance
-            ServiceHandler sh = new ServiceHandler();
-
-//            String url = "http://vikray.in/MyService.asmx/GetEmployessJSONNewN";
-            String url = getString(R.string.url)+"MyService.asmx/DeleteUserDetails?id=" + del_id;
-            // Making a request to url and getting response
-
-            String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
-            Log.d("Response: ", "> " + jsonStr);
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-            new GetInspectorList().execute();
-
-        }
-    }
-
-    private void GetSavedInspectorList() {
-
-        TinyDB tiny = new TinyDB(MainActivity.this);
-        savedList = tiny.getListString("Names");
-
-        for (int i = 0; i < savedList.size(); i++) {
-
-            String name = savedList.get(i);
-            String id = savedListId.get(i);
-            HashMap<String, String> contact = new HashMap<String, String>();
-
-            // adding each child node to HashMap key => value
-            contact.put(TAG_INSPECTOR, name);
-            contact.put(TAG_ID,id);
-            dataList.add(contact);
-        }
-
-        ListAdapter adapter = new SimpleAdapter(
-                MainActivity.this, dataList,
-                R.layout.layout_inspector, new String[]{TAG_INSPECTOR,TAG_ID}, new int[]{R.id.inspector,R.id.inspector_id
-        });
-
-        inspector_list.setAdapter(adapter);
-
-    }
-
-    //AsyncTask to get rejected tasks(to be edited)
     private class GetInspectorList extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -273,11 +151,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... arg0) {
+
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
-
-            String url = getString(R.string.url)+"MyService.asmx/ExcProcedure?Para=Proc_GetUserMst&Para=2";
-            // Making a request to url and getting response
+            String url = getString(R.string.url)+"EagleXpetizeService.svc/UsersListByType/Inspector";
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
 
             Log.d("Response: ", "> " + jsonStr);
@@ -287,29 +164,22 @@ public class MainActivity extends AppCompatActivity {
                 try {
 
                     tasks = new JSONArray(jsonStr);
-                    // looping through All Contacts
+                    // looping through Array
                     for (int i = 0; i < tasks.length(); i++) {
                         JSONObject c = tasks.getJSONObject(i);
 
                         String id = c.getString(TAG_ID);
                         String name = c.getString(TAG_NAME);
 
-                        dbListName.add(name);
-                        dbListId.add(id);
-
                         // tmp hashmap for single contact
                         HashMap<String, String> contact = new HashMap<String, String>();
 
                         // adding each child node to HashMap key => value
-                        contact.put(TAG_INSPECTOR, name);
+                        contact.put(TAG_NAME, name);
                         contact.put(TAG_ID, id);
                         dataList.add(contact);
 
                     }
-
-                    TinyDB tiny = new TinyDB(MainActivity.this);
-                    tiny.putListString("Names", (ArrayList<String>) dbListName);
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -329,20 +199,13 @@ public class MainActivity extends AppCompatActivity {
 
             ListAdapter adapter = new SimpleAdapter(
                     MainActivity.this, dataList,
-                    R.layout.layout_inspector, new String[]{TAG_INSPECTOR, TAG_ID}, new int[]{R.id.inspector, R.id.inspector_id
+                    R.layout.layout_inspector, new String[]{TAG_NAME, TAG_ID}, new int[]{R.id.inspector, R.id.inspector_id
             });
 
             inspector_list.setAdapter(adapter);
         }
     }
 
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
 

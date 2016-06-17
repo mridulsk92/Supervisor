@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Supervisor</string>
+    <string name="app_name">Supervisor EagleXpetize</string>
     <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to login -->
-    <string name="url_local">http://10.0.2.2/MobApp/</string>
+    <!--<string name="url">http://10.0.2.2/</string>-->
     <string name="url">http://vikray.in/</string>
 
     <string name="prompt_email">Email</string>

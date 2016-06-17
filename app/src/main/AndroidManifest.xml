@@ -27,16 +27,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.mridul_xpetize.supervisor.NotificationActivity" />
         </activity>
-        <activity android:name=".ApprovalActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.mridul_xpetize.supervisor.ApprovalActivity" />
-        </activity>
-        <activity android:name=".TaskDetailsActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.mridul_xpetize.supervisor.TaskDetailsActivity" />
-        </activity>
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,8 +35,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoginActivity" />
-        <activity android:name=".FullImageActivity" />
-        <activity android:name=".TestActivity" />
         <activity android:name=".DashboardActivity"></activity>
     </application>
 

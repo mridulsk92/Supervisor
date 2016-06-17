@@ -14,7 +14,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/editText_username"
         android:hint="Username"
-        android:textColorHint="@android:color/holo_blue_dark"
+        android:textColorHint="@color/text_color"
+        android:backgroundTint="@color/text_color"
         android:textCursorDrawable="@null"
         android:textColor="@color/text_color"
         android:layout_alignParentTop="true"
@@ -27,6 +28,8 @@
         android:inputType="textPassword"
         android:hint="Password"
         android:ems="10"
+        android:backgroundTint="@color/text_color"
+        android:textColorHint="@color/text_color"
         android:textCursorDrawable="@null"
         android:textColor="@color/text_color"
         android:id="@+id/editText_password"
@@ -41,4 +44,14 @@
         android:id="@+id/button_login"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo_ic"
+        android:layout_marginTop="48dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

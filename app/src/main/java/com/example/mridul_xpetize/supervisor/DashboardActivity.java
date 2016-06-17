@@ -36,7 +36,7 @@ public class DashboardActivity extends AppCompatActivity {
         toolbar.setTitle("Supervisor");
 
         pref = new PreferencesHelper(DashboardActivity.this);
-        String name = pref.GetPreferences("Name");
+        String name = pref.GetPreferences("UserName");
 
         //Adding Header to the Navigation Drawer
         AccountHeader headerResult = new AccountHeaderBuilder()
@@ -82,8 +82,8 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent i = new Intent(DashboardActivity.this, TestActivity.class);
-                startActivity(i);
+//                Intent i = new Intent(DashboardActivity.this, TestActivity.class);
+//                startActivity(i);
             }
         });
 

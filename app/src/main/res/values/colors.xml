@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="hamburgerIconColor">#FFFFFF</color>
+    <color name="background">#333</color>
+    <color name="text_color">#FFFFFF</color>
 </resources>

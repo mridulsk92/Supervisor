@@ -31,11 +31,9 @@ public class LoginActivity extends AppCompatActivity {
 
     ArrayList<HashMap<String, String>> dataList;
 
-    JSONArray tasks;
-    private static String TAG_NAME = "Name";
-    private static String TAG_ID = "Id";
-    private static String TAG_DESIGNATION = "Designation";
-    private static String TAG_USERNAME = "UserName";
+    private static String TAG_NAME = "UserName";
+    private static String TAG_ID = "UserId";
+    private static String TAG_MESSAGE = "Message";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,13 +79,11 @@ public class LoginActivity extends AppCompatActivity {
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
 
-            String designation = pref.GetPreferences("Designation");
-//            String url = "http://vikray.in/MyService.asmx/ExcProcedure?Para=Proc_ChkLogin&Para=" + username_st + "&Para=" + password_st+"&Para="+designation;
+            String url = getString(R.string.url) + "EagleXpetizeService.svc/CheckUserLogin/" + username_st + "/" + password_st + "/Supervisor";
 
-            String url = getString(R.string.url)+"MyService.asmx/ExcProcedure?Para=Proc_ChkLogin&Para=" + username_st + "&Para=" + password_st+"&Para="+designation;
-
-            Log.d("url",url);
+            Log.d("url", url);
             // Making a request to url and getting response
+
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
             Log.d("Response: ", "> " + jsonStr);
 
@@ -95,22 +91,18 @@ public class LoginActivity extends AppCompatActivity {
 
                 try {
 
-                    tasks = new JSONArray(jsonStr);
-                    // looping through All Contacts
-                    for (int i = 0; i < tasks.length(); i++) {
-                        JSONObject c = tasks.getJSONObject(i);
+                    JSONObject jsonObject = new JSONObject(jsonStr);
 
-                        String id = c.getString(TAG_ID);
-                        String name = c.getString(TAG_NAME);
-                        String username = c.getString(TAG_USERNAME);
+                    String id = jsonObject.getString(TAG_ID);
+                    String message = jsonObject.getString(TAG_MESSAGE);
+                    String name = jsonObject.getString(TAG_NAME);
 
-                        if (username.equals(username_st)) {
-
-                            response = 200;
-                            pref.SavePreferences("User Id", id);
-                            pref.SavePreferences("Name", name);
-                            pref.SavePreferences("User Name", username);
-                        }
+                    if (message.equals("Success")) {
+                        response = 200;
+                        pref.SavePreferences("UserId",id);
+                        pref.SavePreferences("UserName",name);
+                    } else {
+                        response = 201;
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

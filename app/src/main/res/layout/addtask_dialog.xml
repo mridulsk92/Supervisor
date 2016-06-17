@@ -63,7 +63,6 @@
                 android:id="@+id/editText_location"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-
                 android:background="@drawable/edit_text_style"
                 android:hint="Location"
                 android:padding="5dp"
@@ -71,14 +70,26 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
 
+            <EditText
+                android:id="@+id/editText_comments"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edit_text_style"
+                android:hint="Comments"
+                android:layout_marginTop="5dp"
+                android:layout_below="@+id/editText_location"
+                android:padding="5dp"
+                />
+
             <Button
                 android:id="@+id/button_add"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="Add"
-                android:layout_below="@+id/editText_location"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                android:layout_below="@+id/editText_comments"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
 
             <ImageButton
                 android:id="@+id/imageButton_startDate"

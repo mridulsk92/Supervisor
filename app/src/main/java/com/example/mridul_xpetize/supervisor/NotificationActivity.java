@@ -97,18 +97,6 @@ public class NotificationActivity extends AppCompatActivity {
 //        new GetInspectorList().execute();
         new GetTaskList().execute();
 
-        //onItem click listener for list items
-        inspector_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                String taskid = ((TextView) view.findViewById(R.id.task_id)).getText().toString();
-
-                Intent i = new Intent(NotificationActivity.this, ApprovalActivity.class);
-                i.putExtra("id", taskid);
-                startActivity(i);
-            }
-        });
     }
 
     //AsyncTask to get tasks(to be edited)

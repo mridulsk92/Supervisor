@@ -3,21 +3,22 @@ package com.example.mridul_xpetize.supervisor;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.LayerDrawable;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -25,11 +26,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -41,14 +40,25 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 public class InspectorActivity extends AppCompatActivity {
@@ -61,24 +71,19 @@ public class InspectorActivity extends AppCompatActivity {
     Calendar myCalendarS, myCalendarE;
     EditText startDate, endDate;
     ProgressDialog pDialog;
-    String insp_id;
-    String desc, stdate, enddate;
+    String desc, stdate, enddate, loc_st, comments_st, insp_id;
     int priority;
     JSONArray tasks;
     PreferencesHelper pref;
+    LayoutInflater inflater;
+    CustomAdapter cardAdapter;
 
-    private static String TAG_DESCRIPTION = "Description";
-    private static String TAG_ID = "Id";
-    private static String TAG_STARTDATE = "TaskStartDate";
-    private static String TAG_ENDDATE = "TaskEndDate";
-    private static String TAG_PRIORITY = "TaskPriority";
+    List<String> popupList = new ArrayList<String>();
+    List<String> popupListId = new ArrayList<String>();
 
-    ArrayList<HashMap<String, String>> dataList;
-    ArrayList<HashMap<String, String>> highPriorityList;
-    ArrayList<HashMap<String, String>> mediumPriorityList;
-    ArrayList<HashMap<String, String>> lowPriorityList;
-
-
+    String user_id;
+    ArrayList<HashMap<String, Object>> dataList;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,7 +95,8 @@ public class InspectorActivity extends AppCompatActivity {
         toolbar.setTitleTextColor(Color.WHITE);
 
         pref = new PreferencesHelper(InspectorActivity.this);
-        String acc_name = pref.GetPreferences("Name");
+        String acc_name = pref.GetPreferences("UserName");
+        user_id = pref.GetPreferences("UserId");
 
         //Add header to navigation drawer
         AccountHeader headerResult = new AccountHeaderBuilder()
@@ -110,54 +116,20 @@ public class InspectorActivity extends AppCompatActivity {
                 .withDisplayBelowStatusBar(true)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName("About").withIcon(getResources().getDrawable(R.drawable.ic_about)).withIdentifier(1).withSelectable(false),
-                        new SecondaryDrawerItem().withName("Log Out").withIcon(getResources().getDrawable(R.drawable.ic_logout)).withIdentifier(2).withSelectable(false),
-                        new SectionDrawerItem().withName("Filter"),
-//                        new SecondaryDrawerItem().withName("New Task").withIcon(getResources().getDrawable(R.drawable.ic_filter)).withSelectable(false),
-                        new SecondaryDrawerItem().withName("All Task").withIcon(getResources().getDrawable(R.drawable.ic_filter)).withIdentifier(6).withSelectable(false),
-                        new SecondaryDrawerItem().withName("High Priority").withIcon(getResources().getDrawable(R.drawable.ic_filter)).withIdentifier(3).withSelectable(false),
-                        new SecondaryDrawerItem().withName("Medium Priority").withIcon(getResources().getDrawable(R.drawable.ic_filter)).withIdentifier(4).withSelectable(false),
-                        new SecondaryDrawerItem().withName("Low Priority").withIcon(getResources().getDrawable(R.drawable.ic_filter)).withIdentifier(5).withSelectable(false)
+                        new SecondaryDrawerItem().withName("Log Out").withIcon(getResources().getDrawable(R.drawable.ic_logout)).withIdentifier(2).withSelectable(false)
                 ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 
                         if (drawerItem != null) {
-                            if (drawerItem.getIdentifier() == 3) {
+                            if (drawerItem.getIdentifier() == 1) {
 
-                                //Load high priority tasks
-                                ListAdapter adapter = new SimpleAdapter(
-                                        InspectorActivity.this, highPriorityList,
-                                        R.layout.layput_tasks, new String[]{TAG_DESCRIPTION, TAG_ID, TAG_STARTDATE, TAG_ENDDATE, TAG_PRIORITY},
-                                        new int[]{R.id.desc, R.id.task_id, R.id.start, R.id.end, R.id.priority});
+                                //Clicked About
 
-                                added_list.setAdapter(adapter);
-                            } else if (drawerItem.getIdentifier() == 4) {
+                            } else if (drawerItem.getIdentifier() == 2) {
 
-                                //Load Medium priority tasks
-                                ListAdapter adapter = new SimpleAdapter(
-                                        InspectorActivity.this, mediumPriorityList,
-                                        R.layout.layput_tasks, new String[]{TAG_DESCRIPTION, TAG_ID, TAG_STARTDATE, TAG_ENDDATE, TAG_PRIORITY},
-                                        new int[]{R.id.desc, R.id.task_id, R.id.start, R.id.end, R.id.priority});
-
-                                added_list.setAdapter(adapter);
-                            } else if (drawerItem.getIdentifier() == 5) {
-
-                                //Load low priority tasks
-                                ListAdapter adapter = new SimpleAdapter(
-                                        InspectorActivity.this, lowPriorityList,
-                                        R.layout.layput_tasks, new String[]{TAG_DESCRIPTION, TAG_ID, TAG_STARTDATE, TAG_ENDDATE, TAG_PRIORITY},
-                                        new int[]{R.id.desc, R.id.task_id, R.id.start, R.id.end, R.id.priority});
-
-                                added_list.setAdapter(adapter);
-                            } else if (drawerItem.getIdentifier() == 6) {
-
-                                //Load all tasks
-                                ListAdapter adapter = new SimpleAdapter(
-                                        InspectorActivity.this, dataList,
-                                        R.layout.layput_tasks, new String[]{TAG_DESCRIPTION, TAG_ID, TAG_STARTDATE, TAG_ENDDATE, TAG_PRIORITY},
-                                        new int[]{R.id.desc, R.id.task_id, R.id.start, R.id.end, R.id.priority});
-
-                                added_list.setAdapter(adapter);
+                                //Clicked LogOut
+                                
                             }
                         }
                         return false;
@@ -170,10 +142,7 @@ public class InspectorActivity extends AppCompatActivity {
 
         //Initialise
         added_list = (ListView) findViewById(R.id.listView_task);
-        dataList = new ArrayList<HashMap<String, String>>();
-        highPriorityList = new ArrayList<HashMap<String, String>>();
-        mediumPriorityList = new ArrayList<HashMap<String, String>>();
-        lowPriorityList = new ArrayList<HashMap<String, String>>();
+        dataList = new ArrayList<>();
         inspector = (TextView) findViewById(R.id.textView_inspector);
 
         //Get Inspector name and display it
@@ -190,29 +159,8 @@ public class InspectorActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                CharSequence options[] = new CharSequence[] {"Select Existing Tasks", "Create New Task"};
+                AddTask();
 
-                final AlertDialog.Builder builder = new AlertDialog.Builder(InspectorActivity.this);
-                builder.setTitle("Select");
-                builder.setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // the user clicked on options[which]
-                        if (which == 0) {
-                            //Code for Existing Tasks
-                        } else {
-                            AddTask();
-                        }
-                    }
-                });
-                builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        //Cancel Dialog
-                    }
-                });
-                builder.show();
             }
         });
     }
@@ -235,6 +183,7 @@ public class InspectorActivity extends AppCompatActivity {
         startDate = (EditText) addView.findViewById(R.id.editText_start);
         endDate = (EditText) addView.findViewById(R.id.editText_end);
         final EditText loc = (EditText) addView.findViewById(R.id.editText_location);
+        final EditText comments = (EditText) addView.findViewById(R.id.editText_comments);
 
         //Add button onClick
         Button addTask = (Button) addView.findViewById(R.id.button_add);
@@ -246,6 +195,8 @@ public class InspectorActivity extends AppCompatActivity {
                 desc = editDescription.getText().toString();
                 stdate = startDate.getText().toString();
                 enddate = endDate.getText().toString();
+                comments_st = comments.getText().toString();
+                loc_st = loc.getText().toString();
                 if (typeSpinner.getSelectedItem().equals("High")) {
                     priority = 1;
                 } else if (typeSpinner.getSelectedItem().equals("Medium")) {
@@ -342,18 +293,51 @@ public class InspectorActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            // Creating service handler class instance
-            ServiceHandler sh = new ServiceHandler();
+            
+            HttpPost request = new HttpPost(getString(R.string.url)+"EagleXpetizeService.svc/NewTask");
+            request.setHeader("Accept", "application/json");
+            request.setHeader("Content-type", "application/json");
 
-            Log.d("test", String.valueOf(priority));
-//            String url = "http://vikray.in/MyService.asmx/GetEmployessJSONNewN";
-            String url = getString(R.string.url)+"MyService.asmx/ExcProcedure?Para=Proc_InsertTaskMst&Para=" + desc + "&Para=" + insp_id + "&Para=2&Para=" + stdate + "&Para=" + enddate + "&Para=" + 3 + "&Para=" + priority + "&Para=" + 2;
-            // Making a request to url and getting response
+            // Build JSON string
+            JSONStringer userJson = null;
+            try {
+                userJson = new JSONStringer()
+                        .object()
+                        .key("task")
+                        .object()
+                        .key("Description").value(desc)
+                        .key("Location").value(loc_st)
+                        .key("StatusId").value("1")
+                        .key("Comments").value(comments_st)
+                        .key("CreatedBy").value(user_id)
+                        .endObject()
+                        .endObject();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-            Log.d("Test", url);
+            Log.d("Json", String.valueOf(userJson));
+            StringEntity entity = null;
+            try {
+                entity = new StringEntity(userJson.toString(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
 
-            String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
-            Log.d("Response: ", "> " + jsonStr);
+            entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+            entity.setContentType("application/json");
+
+            request.setEntity(entity);
+
+            // Send request to WCF service
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            try {
+                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+                String response = httpClient.execute(request, responseHandler);
+                Log.d("res", response);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             return null;
         }
@@ -369,15 +353,15 @@ public class InspectorActivity extends AppCompatActivity {
 
         }
     }
-
-    //AsyncTask to get rejected tasks(to be edited)
+    
     private class GetTaskList extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            // Showing progress dialog
+
             dataList.clear();
+            // Showing progress dialog
             pDialog = new ProgressDialog(InspectorActivity.this);
             pDialog.setMessage("Please wait...");
             pDialog.setCancelable(false);
@@ -388,9 +372,9 @@ public class InspectorActivity extends AppCompatActivity {
         protected Void doInBackground(Void... arg0) {
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
+            
+            String url = getString(R.string.url) + "EagleXpetizeService.svc/Tasks/0/0";
 
-//            String url = "http://vikray.in/MyService.asmx/GetEmployessJSONNewN";
-            String url = getString(R.string.url)+"MyService.asmx/ExcProcedure?Para=Proc_GetTaskMst&Para=" + insp_id;
             // Making a request to url and getting response
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
 
@@ -401,70 +385,23 @@ public class InspectorActivity extends AppCompatActivity {
                 try {
 
                     tasks = new JSONArray(jsonStr);
-                    // looping through All Contacts
+                    // looping through Array
                     for (int i = 0; i < tasks.length(); i++) {
                         JSONObject c = tasks.getJSONObject(i);
 
-                        String id = c.getString(TAG_ID);
-                        String desc = c.getString(TAG_DESCRIPTION);
-                        String st_date = c.getString(TAG_STARTDATE);
-                        String end_date = c.getString(TAG_ENDDATE);
-                        int priority = c.getInt(TAG_PRIORITY);
-                        String priority_string = "High";
-
-                        if (priority == 1) {
-
-                            priority_string = "High";
-
-                            HashMap<String, String> tempHigh = new HashMap<String, String>();
-
-                            tempHigh.put(TAG_DESCRIPTION, "Description : " + desc);
-                            tempHigh.put(TAG_ID, id);
-                            tempHigh.put(TAG_STARTDATE, "Start Date : " + st_date);
-                            tempHigh.put(TAG_ENDDATE, "End Date : " + end_date);
-                            tempHigh.put(TAG_PRIORITY, "Priority : " + priority_string);
-                            highPriorityList.add(tempHigh);
-
-                        } else if (priority == 2) {
-
-                            priority_string = "Medium";
-
-                            HashMap<String, String> tempMedium = new HashMap<String, String>();
-
-                            tempMedium.put(TAG_DESCRIPTION, "Description : " + desc);
-                            tempMedium.put(TAG_ID, id);
-                            tempMedium.put(TAG_STARTDATE, "Start Date : " + st_date);
-                            tempMedium.put(TAG_ENDDATE, "End Date : " + end_date);
-                            tempMedium.put(TAG_PRIORITY, "Priority : " + priority_string);
-                            mediumPriorityList.add(tempMedium);
-
-                        } else if (priority == 3) {
-
-                            priority_string = "Low";
-
-                            HashMap<String, String> tempLow = new HashMap<String, String>();
-
-                            tempLow.put(TAG_DESCRIPTION, "Description : " + desc);
-                            tempLow.put(TAG_ID, id);
-                            tempLow.put(TAG_STARTDATE, "Start Date : " + st_date);
-                            tempLow.put(TAG_ENDDATE, "End Date : " + end_date);
-                            tempLow.put(TAG_PRIORITY, "Priority : " + priority_string);
-                            lowPriorityList.add(tempLow);
-
-                        } else {
-                            priority_string = "High";
-                        }
-
-                        // tmp hashmap for single contact
-                        HashMap<String, String> contact = new HashMap<String, String>();
+                        String id = c.getString("TaskId");
+                        String comments = c.getString("Comments");
+                        String desc = c.getString("Description");
+                        String loc = c.getString("Location");
 
                         // adding each child node to HashMap key => value
-                        contact.put(TAG_DESCRIPTION, "Description : " + desc);
-                        contact.put(TAG_ID, id);
-                        contact.put(TAG_STARTDATE, "Start Date : " + st_date);
-                        contact.put(TAG_ENDDATE, "End Date : " + end_date);
-                        contact.put(TAG_PRIORITY, "Priority : " + priority_string);
-                        dataList.add(contact);
+                        HashMap<String, Object> taskMap = new HashMap<String, Object>();
+
+                        taskMap.put("Description", "Description : " + desc);
+                        taskMap.put("TaskId", id);
+                        taskMap.put("Comments", "Comments : " + comments);
+                        taskMap.put("Location", "Location : " + loc);
+                        dataList.add(taskMap);
 
                     }
                 } catch (JSONException e) {
@@ -484,14 +421,64 @@ public class InspectorActivity extends AppCompatActivity {
             if (pDialog.isShowing())
                 pDialog.dismiss();
 
-            ListAdapter adapter = new SimpleAdapter(
-                    InspectorActivity.this, dataList,
-                    R.layout.layput_tasks, new String[]{TAG_DESCRIPTION, TAG_ID, TAG_STARTDATE, TAG_ENDDATE, TAG_PRIORITY},
-                    new int[]{R.id.desc, R.id.task_id, R.id.start, R.id.end, R.id.priority});
-
-            added_list.setAdapter(adapter);
+            cardAdapter = new CustomAdapter(InspectorActivity.this, R.layout.task_list, dataList);
+            added_list.setAdapter(cardAdapter);
         }
     }
+
+
+    //Define Custom Adapter for Message Cards
+    private class CustomAdapter extends ArrayAdapter<HashMap<String, Object>> {
+
+        public CustomAdapter(Context context, int textViewResourceId, ArrayList<HashMap<String, Object>> Strings) {
+
+            //let android do the initializing :)
+            super(context, textViewResourceId, Strings);
+        }
+
+        //class for caching the views in a row
+        private class ViewHolder {
+
+            TextView status, desc, comments, startdate, enddate, loc, id;
+            CardView cv;
+        }
+
+        //Initialise
+        ViewHolder viewHolder;
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+
+            if (convertView == null) {
+
+                //inflate the custom layout
+                convertView = inflater.from(parent.getContext()).inflate(R.layout.task_list_main, parent, false);
+                viewHolder = new ViewHolder();
+
+                //cache the views
+                viewHolder.status = (TextView) convertView.findViewById(R.id.status);
+                viewHolder.desc = (TextView) convertView.findViewById(R.id.desc);
+                viewHolder.comments = (TextView) convertView.findViewById(R.id.comments);
+                viewHolder.startdate = (TextView) convertView.findViewById(R.id.start);
+                viewHolder.enddate = (TextView) convertView.findViewById(R.id.end);
+                viewHolder.loc = (TextView) convertView.findViewById(R.id.location);
+                viewHolder.id = (TextView) convertView.findViewById(R.id.task_id);
+                viewHolder.cv = (CardView) convertView.findViewById(R.id.card_tasks);
+
+                //link the cached views to the convertview
+                convertView.setTag(viewHolder);
+            } else
+                viewHolder = (ViewHolder) convertView.getTag();
+
+            //set the data to be displayed
+            viewHolder.id.setText(dataList.get(position).get("TaskId").toString());
+            viewHolder.desc.setText(dataList.get(position).get("Description").toString());
+            viewHolder.comments.setText(dataList.get(position).get("Comments").toString());
+            viewHolder.loc.setText(dataList.get(position).get("Location").toString());
+            return convertView;
+        }
+    }
+
 
     private void updateLabelStart() {
 
