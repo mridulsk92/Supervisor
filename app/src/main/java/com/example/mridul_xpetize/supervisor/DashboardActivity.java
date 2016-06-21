@@ -15,8 +15,10 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -32,8 +34,8 @@ public class DashboardActivity extends AppCompatActivity {
         //Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitleTextColor(Color.WHITE);
-        toolbar.setTitle("Supervisor");
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setLogo(R.drawable.logo_ic);
 
         pref = new PreferencesHelper(DashboardActivity.this);
         String name = pref.GetPreferences("UserName");
@@ -46,25 +48,42 @@ public class DashboardActivity extends AppCompatActivity {
                         new ProfileDrawerItem().withName(name).withEmail(name+"@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
                 ).build();
 
-        //Drawer
+        //Side Drawer contents
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withAccountHeader(headerResult)
                 .withToolbar(toolbar)
                 .withTranslucentStatusBar(false)
+                .withSelectedItem(-1)
                 .withDisplayBelowStatusBar(true)
                 .addDrawerItems(
-                        new SecondaryDrawerItem().withName("About").withIcon(getResources().getDrawable(R.drawable.ic_about)).withSelectable(false),
-                        new SecondaryDrawerItem().withName("Log Out").withIcon(getResources().getDrawable(R.drawable.ic_logout)).withSelectable(false)
-                ).build();
+                        new PrimaryDrawerItem().withName("About").withIcon(getResources().getDrawable(R.drawable.ic_about)).withIdentifier(1).withSelectable(false),
+                        new SecondaryDrawerItem().withName("Log Out").withIcon(getResources().getDrawable(R.drawable.ic_logout)).withIdentifier(2).withSelectable(false)
+                ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+
+                        if (drawerItem != null) {
+                            if (drawerItem.getIdentifier() == 1) {
+
+                                //Clicked About
+
+                            } else if (drawerItem.getIdentifier() == 4) {
+
+                                //Clicked LogOut
+
+                            }
+                        }
+                        return false;
+                    }
+                }).build();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         result.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
 
         //Initialise
         view_inspectors = (ImageButton) findViewById(R.id.imageButton_inspectors);
-        add_inspectors = (ImageButton) findViewById(R.id.imageButton_addInsp);
-        notification = (ImageButton) findViewById(R.id.imageButton_notification);
+        notification = (ImageButton) findViewById(R.id.imageButton_not);
         logout = (ImageButton) findViewById(R.id.imageButton_logout);
 
         //onClick of view inspectors
@@ -74,16 +93,6 @@ public class DashboardActivity extends AppCompatActivity {
 
                 Intent i = new Intent(DashboardActivity.this, MainActivity.class);
                 startActivity(i);
-            }
-        });
-
-        //onClick of add inspectors
-        add_inspectors.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-//                Intent i = new Intent(DashboardActivity.this, TestActivity.class);
-//                startActivity(i);
             }
         });
 

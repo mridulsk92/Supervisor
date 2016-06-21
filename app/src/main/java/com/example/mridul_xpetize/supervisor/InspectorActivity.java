@@ -92,7 +92,8 @@ public class InspectorActivity extends AppCompatActivity {
         //Initialise and add Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitleTextColor(Color.WHITE);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setLogo(R.drawable.logo_ic);
 
         pref = new PreferencesHelper(InspectorActivity.this);
         String acc_name = pref.GetPreferences("UserName");
@@ -161,6 +162,35 @@ public class InspectorActivity extends AppCompatActivity {
 
                 AddTask();
 
+                //Show DialogBox
+//                final android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(InspectorActivity.this);
+//                alertDialogBuilder.setTitle("Confirm");
+//                alertDialogBuilder.setMessage("Do You Want to Log Out ?");
+//
+//                final CharSequence items[] = { "Select Pre Defined tasks", "Create Tasks" };
+//                alertDialogBuilder.setItems(items, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//
+//                        if(which == 0){
+//                            //Select Pre defined tasks
+//
+//                        }else{
+//                            //Create tasks
+//                        }
+//                    }
+//                });
+//                alertDialogBuilder.setNegativeButton("Cancel",
+//                        new DialogInterface.OnClickListener() {
+//
+//                            @Override
+//                            public void onClick(DialogInterface arg0, int arg1) {
+//
+//                            }
+//                        });
+//
+//                android.support.v7.app.AlertDialog alertDialog = alertDialogBuilder.create();
+//                alertDialog.show();
             }
         });
     }
@@ -426,7 +456,6 @@ public class InspectorActivity extends AppCompatActivity {
         }
     }
 
-
     //Define Custom Adapter for Message Cards
     private class CustomAdapter extends ArrayAdapter<HashMap<String, Object>> {
 
@@ -478,7 +507,6 @@ public class InspectorActivity extends AppCompatActivity {
             return convertView;
         }
     }
-
 
     private void updateLabelStart() {
 

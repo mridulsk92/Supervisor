@@ -61,8 +61,8 @@ public class NotificationActivity extends AppCompatActivity {
         //Initialise toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Notification");
-        toolbar.setTitleTextColor(Color.WHITE);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setLogo(R.drawable.logo_ic);
 
         pref = new PreferencesHelper(NotificationActivity.this);
         String acc_name = pref.GetPreferences("Name");

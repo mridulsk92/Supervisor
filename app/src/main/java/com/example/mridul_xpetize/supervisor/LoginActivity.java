@@ -31,6 +31,7 @@ public class LoginActivity extends AppCompatActivity {
 
     ArrayList<HashMap<String, String>> dataList;
 
+    JSONArray tasks;
     private static String TAG_NAME = "UserName";
     private static String TAG_ID = "UserId";
     private static String TAG_MESSAGE = "Message";

@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -74,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
     Button add;
     String del_id;
     PreferencesHelper pref;
+    private ArrayAdapter<String> adapter;
+    private ArrayList<String> stringArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +87,8 @@ public class MainActivity extends AppCompatActivity {
         //Initialise toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitleTextColor(Color.WHITE);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setLogo(R.drawable.logo_ic);
 
         pref = new PreferencesHelper(MainActivity.this);
         String name = pref.GetPreferences("UserName");
@@ -94,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(name).withEmail(name+"@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
+                        new ProfileDrawerItem().withName(name).withEmail(name + "@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
                 ).build();
 
         result = new DrawerBuilder()
@@ -126,17 +130,18 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String name = ((TextView) view.findViewById(R.id.inspector)).getText().toString();
-                String id_insp = ((TextView)view.findViewById(R.id.inspector_id)).getText().toString();
+                String id_insp = ((TextView) view.findViewById(R.id.inspector_id)).getText().toString();
 
                 Intent i = new Intent(MainActivity.this, InspectorActivity.class);
                 i.putExtra("name", name);
-                i.putExtra("Id",id_insp);
+                i.putExtra("Id", id_insp);
                 startActivity(i);
             }
         });
     }
 
-    private class GetInspectorList extends AsyncTask<Void, Void, Void> {
+    class GetInspectorList extends AsyncTask<Void, Void, Void> {
+
 
         @Override
         protected void onPreExecute() {
@@ -154,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
-            String url = getString(R.string.url)+"EagleXpetizeService.svc/UsersListByType/Inspector";
+            String url = getString(R.string.url) + "EagleXpetizeService.svc/UsersListByType/Inspector";
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
 
             Log.d("Response: ", "> " + jsonStr);
@@ -174,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                         // tmp hashmap for single contact
                         HashMap<String, String> contact = new HashMap<String, String>();
 
-                        // adding each child node to HashMap key => value
+                        // adding each child node to HashMap key => value`
                         contact.put(TAG_NAME, name);
                         contact.put(TAG_ID, id);
                         dataList.add(contact);
@@ -203,9 +208,12 @@ public class MainActivity extends AppCompatActivity {
             });
 
             inspector_list.setAdapter(adapter);
+
+//            setData();
+//            adapter = new ListViewAdapter(MainActivity.this, R.layout.layout_inspector, stringArrayList);
+//            inspector_list.setAdapter(adapter);
         }
     }
-
 
     public boolean onCreateOptionsMenu(Menu menu) {
 

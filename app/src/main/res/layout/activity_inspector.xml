@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#2d89ef"
     tools:context="com.example.mridul_xpetize.supervisor.InspectorActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="fill_parent"
-        app:theme="@style/ToolbarColoredBackArrow"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary" />
+        android:background="@color/background"
+        app:theme="@style/ToolbarColoredBackArrow" />
 
 
     <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,14 +22,14 @@
         layout_width="wrap_content"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_below="@+id/toolbar"
-        card_view:cardCornerRadius="5dp"
-        card_view:cardElevation="2dp"
-        card_view:contentPadding="16dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
-        android:layout_alignParentBottom="true">
+        card_view:cardCornerRadius="5dp"
+        card_view:cardElevation="2dp"
+        card_view:contentPadding="16dp">
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -65,13 +65,13 @@
                 android:id="@+id/fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:background="@null"
-                android:tint="@color/cardview_light_background"
-                android:src="@android:drawable/ic_input_add"
+                android:layout_alignEnd="@+id/listView_task"
                 android:layout_alignParentBottom="true"
                 android:layout_alignRight="@+id/listView_task"
-                android:layout_alignEnd="@+id/listView_task" />
+                android:layout_gravity="bottom|end"
+                android:background="@null"
+                android:src="@android:drawable/ic_input_add"
+                android:tint="@color/cardview_light_background" />
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>

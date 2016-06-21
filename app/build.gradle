@@ -28,7 +28,6 @@ dependencies {
     compile('com.mikepenz:materialdrawer:5.1.1@aar') {
         transitive = true
     }
-
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support:cardview-v7:23.2.0'
     testCompile 'junit:junit:4.12'
