@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -61,8 +62,7 @@ public class NotificationActivity extends AppCompatActivity {
         //Initialise toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setLogo(R.drawable.logo_ic);
+        toolbar.setTitle("Supervisor");
 
         pref = new PreferencesHelper(NotificationActivity.this);
         String acc_name = pref.GetPreferences("Name");
@@ -189,14 +189,32 @@ public class NotificationActivity extends AppCompatActivity {
         super.finish();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        //inflate menu
+        getMenuInflater().inflate(R.menu.menu_my, menu);
+
+        // Get the notifications MenuItem and LayerDrawable (layer-list)
+        MenuItem item_noti = menu.findItem(R.id.action_noti);
+        MenuItem item_logOut = menu.findItem(R.id.action_logOut);
+
+        item_logOut.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+
+                return false;
+            }
+        });
+
+        item_noti.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                return false;
+            }
+        });
+
+        return true;
     }
 }

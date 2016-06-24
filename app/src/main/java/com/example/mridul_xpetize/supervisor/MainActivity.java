@@ -87,8 +87,7 @@ public class MainActivity extends AppCompatActivity {
         //Initialise toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setLogo(R.drawable.logo_ic);
+        toolbar.setTitle("Supervisor");
 
         pref = new PreferencesHelper(MainActivity.this);
         String name = pref.GetPreferences("UserName");
@@ -175,12 +174,14 @@ public class MainActivity extends AppCompatActivity {
 
                         String id = c.getString(TAG_ID);
                         String name = c.getString(TAG_NAME);
+                        String type = c.getString("Type");
 
                         // tmp hashmap for single contact
                         HashMap<String, String> contact = new HashMap<String, String>();
 
                         // adding each child node to HashMap key => value`
                         contact.put(TAG_NAME, name);
+                        contact.put("Type", type);
                         contact.put(TAG_ID, id);
                         dataList.add(contact);
 
@@ -204,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
             ListAdapter adapter = new SimpleAdapter(
                     MainActivity.this, dataList,
-                    R.layout.layout_inspector, new String[]{TAG_NAME, TAG_ID}, new int[]{R.id.inspector, R.id.inspector_id
+                    R.layout.layout_inspector, new String[]{TAG_NAME, TAG_ID, "Type"}, new int[]{R.id.inspector, R.id.inspector_id, R.id.type
             });
 
             inspector_list.setAdapter(adapter);
@@ -221,21 +222,27 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_my, menu);
 
         // Get the notifications MenuItem and LayerDrawable (layer-list)
-//        MenuItem item = menu.findItem(R.id.action_notifications);
-////        LayerDrawable icon = (LayerDrawable) item.getIcon();
-//
-//        // Update LayerDrawable's BadgeDrawable
-////        Utils2.setBadgeCount(this, icon, 2);
-//
-//        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//
-//                Intent i = new Intent(MainActivity.this, NotificationActivity.class);
-//                startActivity(i);
-//                return false;
-//            }
-//        });
+        MenuItem item_noti = menu.findItem(R.id.action_noti);
+        MenuItem item_logOut = menu.findItem(R.id.action_logOut);
+
+        item_logOut.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+
+                return false;
+            }
+        });
+
+        item_noti.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                Intent i = new Intent(MainActivity.this, NotificationActivity.class);
+                startActivity(i);
+                return false;
+            }
+        });
 
         return true;
     }

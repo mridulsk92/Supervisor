@@ -16,6 +16,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,8 +72,8 @@ public class InspectorActivity extends AppCompatActivity {
     Calendar myCalendarS, myCalendarE;
     EditText startDate, endDate;
     ProgressDialog pDialog;
-    String desc, stdate, enddate, loc_st, comments_st, insp_id;
     int priority;
+    String insp_id;
     JSONArray tasks;
     PreferencesHelper pref;
     LayoutInflater inflater;
@@ -83,7 +84,7 @@ public class InspectorActivity extends AppCompatActivity {
 
     String user_id;
     ArrayList<HashMap<String, Object>> dataList;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,8 +93,7 @@ public class InspectorActivity extends AppCompatActivity {
         //Initialise and add Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setLogo(R.drawable.logo_ic);
+        toolbar.setTitle("Supervisor");
 
         pref = new PreferencesHelper(InspectorActivity.this);
         String acc_name = pref.GetPreferences("UserName");
@@ -104,7 +104,7 @@ public class InspectorActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(acc_name).withEmail(acc_name+"@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
+                        new ProfileDrawerItem().withName(acc_name).withEmail(acc_name + "@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
                 ).build();
 
         //Drawer
@@ -130,7 +130,7 @@ public class InspectorActivity extends AppCompatActivity {
                             } else if (drawerItem.getIdentifier() == 2) {
 
                                 //Clicked LogOut
-                                
+
                             }
                         }
                         return false;
@@ -152,7 +152,7 @@ public class InspectorActivity extends AppCompatActivity {
         String name = i.getStringExtra("name");
         inspector.setText(name);
 
-        new GetTaskList().execute();
+        new GetTaskList().execute("User");
 
         //onClick of Floating Button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -160,37 +160,35 @@ public class InspectorActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                AddTask();
-
                 //Show DialogBox
-//                final android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(InspectorActivity.this);
-//                alertDialogBuilder.setTitle("Confirm");
-//                alertDialogBuilder.setMessage("Do You Want to Log Out ?");
-//
-//                final CharSequence items[] = { "Select Pre Defined tasks", "Create Tasks" };
-//                alertDialogBuilder.setItems(items, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//
-//                        if(which == 0){
-//                            //Select Pre defined tasks
-//
-//                        }else{
-//                            //Create tasks
-//                        }
-//                    }
-//                });
-//                alertDialogBuilder.setNegativeButton("Cancel",
-//                        new DialogInterface.OnClickListener() {
-//
-//                            @Override
-//                            public void onClick(DialogInterface arg0, int arg1) {
-//
-//                            }
-//                        });
-//
-//                android.support.v7.app.AlertDialog alertDialog = alertDialogBuilder.create();
-//                alertDialog.show();
+                final android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(InspectorActivity.this);
+                alertDialogBuilder.setTitle("Select a Task");
+                final CharSequence items[] = {"Select Pre Defined tasks", "Create Tasks"};
+                alertDialogBuilder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        if (which == 0) {
+                            //Select Pre defined tasks
+                            new GetTaskList().execute("All");
+                        } else {
+                            //Create tasks
+                            AddTask();
+                        }
+                    }
+                });
+                alertDialogBuilder.setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1) {
+
+                            }
+                        });
+
+                android.support.v7.app.AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+
             }
         });
     }
@@ -222,11 +220,11 @@ public class InspectorActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                desc = editDescription.getText().toString();
-                stdate = startDate.getText().toString();
-                enddate = endDate.getText().toString();
-                comments_st = comments.getText().toString();
-                loc_st = loc.getText().toString();
+                String desc = editDescription.getText().toString();
+                String stdate = startDate.getText().toString();
+                String enddate = endDate.getText().toString();
+                String comments_st = comments.getText().toString();
+                String loc_st = loc.getText().toString();
                 if (typeSpinner.getSelectedItem().equals("High")) {
                     priority = 1;
                 } else if (typeSpinner.getSelectedItem().equals("Medium")) {
@@ -238,8 +236,13 @@ public class InspectorActivity extends AppCompatActivity {
                 }
 
                 addDialog.dismiss();
-                new PostTasks().execute();
-
+                String createdBy = user_id;
+                ArrayList<String> passing = new ArrayList<String>();
+                passing.add(desc);
+                passing.add(loc_st);
+                passing.add(comments_st);
+                passing.add(createdBy);
+                new PostTasks().execute(passing);
             }
         });
 
@@ -309,7 +312,7 @@ public class InspectorActivity extends AppCompatActivity {
         addDialog.show();
     }
 
-    private class PostTasks extends AsyncTask<Void, Void, Void> {
+    private class AssingnTask extends AsyncTask<ArrayList<String>, Void, ArrayList<String>> {
 
         @Override
         protected void onPreExecute() {
@@ -322,9 +325,99 @@ public class InspectorActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Void doInBackground(Void... arg0) {
-            
-            HttpPost request = new HttpPost(getString(R.string.url)+"EagleXpetizeService.svc/NewTask");
+        protected ArrayList<String> doInBackground(ArrayList<String>... params) {
+
+            ArrayList<String> passed = params[0]; //get passed arraylist
+            String taskid_st = passed.get(0);
+            String userId_st = passed.get(1);
+            String createdBy_st = passed.get(2);
+            String status_st = passed.get(3);
+            String comments_st = passed.get(4);
+
+            HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/AssignTask");
+            request.setHeader("Accept", "application/json");
+            request.setHeader("Content-type", "application/json");
+
+            // Build JSON string
+            JSONStringer userJson = null;
+            try {
+                userJson = new JSONStringer()
+                        .object()
+                        .key("taskDetails")
+                        .object()
+                        .key("TaskId").value(taskid_st)
+                        .key("AssignedToId").value(insp_id)
+                        .key("AssignedById").value(createdBy_st)
+                        .key("StatusId").value(status_st)
+                        .key("IsSubTask").value(0)
+                        .key("Comments").value(comments_st)
+                        .key("CreatedBy").value(createdBy_st)
+                        .endObject()
+                        .endObject();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.d("Json", String.valueOf(userJson));
+            StringEntity entity = null;
+            try {
+                entity = new StringEntity(userJson.toString(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+            entity.setContentType("application/json");
+
+            request.setEntity(entity);
+
+            // Send request to WCF service
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            try {
+                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+                String response = httpClient.execute(request, responseHandler);
+                Log.d("res", response);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<String> result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            new GetTaskList().execute("User");
+
+        }
+    }
+
+    private class PostTasks extends AsyncTask<ArrayList<String>, Void, ArrayList<String>> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(InspectorActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected ArrayList<String> doInBackground(ArrayList<String>... passing) {
+
+
+            ArrayList<String> passed = passing[0]; //get passed arraylist
+            String desc = passed.get(0);
+            String loc = passed.get(1);
+            String comments = passed.get(2);
+            String createdBy = passed.get(3);
+
+            HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/NewTask");
             request.setHeader("Accept", "application/json");
             request.setHeader("Content-type", "application/json");
 
@@ -336,10 +429,10 @@ public class InspectorActivity extends AppCompatActivity {
                         .key("task")
                         .object()
                         .key("Description").value(desc)
-                        .key("Location").value(loc_st)
+                        .key("Location").value(loc)
                         .key("StatusId").value("1")
-                        .key("Comments").value(comments_st)
-                        .key("CreatedBy").value(user_id)
+                        .key("Comments").value(comments)
+                        .key("CreatedBy").value(createdBy)
                         .endObject()
                         .endObject();
             } catch (JSONException e) {
@@ -373,18 +466,18 @@ public class InspectorActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(ArrayList<String> result) {
             super.onPostExecute(result);
             // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();
 
-            new GetTaskList().execute();
+            new GetTaskList().execute("User");
 
         }
     }
-    
-    private class GetTaskList extends AsyncTask<Void, Void, Void> {
+
+    private class GetTaskList extends AsyncTask<String, Void, String> {
 
         @Override
         protected void onPreExecute() {
@@ -399,11 +492,22 @@ public class InspectorActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Void doInBackground(Void... arg0) {
+        protected String doInBackground(String... arg0) {
             // Creating service handler class instance
+
+            String url;
+            String check = arg0[0];
+
             ServiceHandler sh = new ServiceHandler();
-            
-            String url = getString(R.string.url) + "EagleXpetizeService.svc/Tasks/0/0";
+
+            String userId = pref.GetPreferences("UserId");
+            if (check.equals("User")) {
+                url = getString(R.string.url) + "EagleXpetizeService.svc/Tasks/" + insp_id + "/1";
+                Log.d("URL",url);
+            } else {
+                url = getString(R.string.url) + "EagleXpetizeService.svc/Tasks/0/1";
+                Log.d("URL",url);
+            }
 
             // Making a request to url and getting response
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
@@ -423,14 +527,17 @@ public class InspectorActivity extends AppCompatActivity {
                         String comments = c.getString("Comments");
                         String desc = c.getString("Description");
                         String loc = c.getString("Location");
+                        String assigned = c.getString("CreatedBy");
 
                         // adding each child node to HashMap key => value
                         HashMap<String, Object> taskMap = new HashMap<String, Object>();
 
-                        taskMap.put("Description", "Description : " + desc);
+                        taskMap.put("Description", desc);
                         taskMap.put("TaskId", id);
-                        taskMap.put("Comments", "Comments : " + comments);
-                        taskMap.put("Location", "Location : " + loc);
+                        taskMap.put("Comments", comments);
+                        taskMap.put("Location", loc);
+                        taskMap.put("CreatedBy", assigned);
+                        popupList.add(desc);
                         dataList.add(taskMap);
 
                     }
@@ -441,22 +548,56 @@ public class InspectorActivity extends AppCompatActivity {
                 Log.e("ServiceHandler", "Couldn't get any data from the url");
             }
 
-            return null;
+            return check;
         }
 
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(String result) {
             super.onPostExecute(result);
             // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();
 
-            cardAdapter = new CustomAdapter(InspectorActivity.this, R.layout.task_list, dataList);
-            added_list.setAdapter(cardAdapter);
+            if (result.equals("User")) {
+                cardAdapter = new CustomAdapter(InspectorActivity.this, R.layout.task_list, dataList);
+                added_list.setAdapter(cardAdapter);
+            } else {
+
+                CharSequence[] items = popupList.toArray(new CharSequence[popupList.size()]);
+                AlertDialog.Builder builderSingle = new AlertDialog.Builder(InspectorActivity.this);
+                builderSingle.setTitle("Select A Task");
+
+                builderSingle.setNegativeButton(
+                        "Cancel",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                builderSingle.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String id = dataList.get(which).get("TaskId").toString();
+//                        String statusId = dataList.get(which).get("StatusId").toString();
+                        String comments = dataList.get(which).get("Comments").toString();
+                        String createdBy = dataList.get(which).get("CreatedBy").toString();
+                        ArrayList<String> passing = new ArrayList<String>();
+                        passing.add(id);
+                        passing.add(user_id);
+                        passing.add(createdBy);
+                        passing.add("1");
+                        passing.add(comments);
+                        passing.add(createdBy);
+                        new AssingnTask().execute(passing);
+                    }
+                });
+                builderSingle.show();
+            }
         }
     }
 
-    //Define Custom Adapter for Message Cards
     private class CustomAdapter extends ArrayAdapter<HashMap<String, Object>> {
 
         public CustomAdapter(Context context, int textViewResourceId, ArrayList<HashMap<String, Object>> Strings) {
@@ -468,8 +609,7 @@ public class InspectorActivity extends AppCompatActivity {
         //class for caching the views in a row
         private class ViewHolder {
 
-            TextView status, desc, comments, startdate, enddate, loc, id;
-            CardView cv;
+            TextView status, desc, comments, startdate, enddate, loc, id, assigned;
         }
 
         //Initialise
@@ -485,6 +625,7 @@ public class InspectorActivity extends AppCompatActivity {
                 viewHolder = new ViewHolder();
 
                 //cache the views
+                viewHolder.assigned = (TextView) convertView.findViewById(R.id.assigned);
                 viewHolder.status = (TextView) convertView.findViewById(R.id.status);
                 viewHolder.desc = (TextView) convertView.findViewById(R.id.desc);
                 viewHolder.comments = (TextView) convertView.findViewById(R.id.comments);
@@ -492,7 +633,7 @@ public class InspectorActivity extends AppCompatActivity {
                 viewHolder.enddate = (TextView) convertView.findViewById(R.id.end);
                 viewHolder.loc = (TextView) convertView.findViewById(R.id.location);
                 viewHolder.id = (TextView) convertView.findViewById(R.id.task_id);
-                viewHolder.cv = (CardView) convertView.findViewById(R.id.card_tasks);
+//                viewHolder.cv = (CardView) convertView.findViewById(R.id.card_tasks);
 
                 //link the cached views to the convertview
                 convertView.setTag(viewHolder);
@@ -500,6 +641,7 @@ public class InspectorActivity extends AppCompatActivity {
                 viewHolder = (ViewHolder) convertView.getTag();
 
             //set the data to be displayed
+            viewHolder.assigned.setText(dataList.get(position).get("CreatedBy").toString());
             viewHolder.id.setText(dataList.get(position).get("TaskId").toString());
             viewHolder.desc.setText(dataList.get(position).get("Description").toString());
             viewHolder.comments.setText(dataList.get(position).get("Comments").toString());
@@ -531,14 +673,33 @@ public class InspectorActivity extends AppCompatActivity {
         list.setEmptyView(empty);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        //inflate menu
+        getMenuInflater().inflate(R.menu.menu_my, menu);
+
+        // Get the notifications MenuItem and LayerDrawable (layer-list)
+        MenuItem item_noti = menu.findItem(R.id.action_noti);
+        MenuItem item_logOut = menu.findItem(R.id.action_logOut);
+
+        item_logOut.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                return false;
+            }
+        });
+
+        item_noti.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                Intent i = new Intent(InspectorActivity.this, NotificationActivity.class);
+                startActivity(i);
+                return false;
+            }
+        });
+
+        return true;
     }
 }

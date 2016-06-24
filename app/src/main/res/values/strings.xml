@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Supervisor EagleXpetize</string>
+    <string name="app_name">Supervisor</string>
     <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to login -->

@@ -4,4 +4,15 @@
     tools:context=".MainActivity">
 
 
+    <item
+        android:id="@+id/action_noti"
+        android:icon="@drawable/blue_bell_small"
+        app:showAsAction="ifRoom"
+        android:title="Not" />
+
+    <item
+        android:id="@+id/action_logOut"
+        android:icon="@drawable/blue_logout_small"
+        app:showAsAction="ifRoom"
+        android:title="Not" />
 </menu>
