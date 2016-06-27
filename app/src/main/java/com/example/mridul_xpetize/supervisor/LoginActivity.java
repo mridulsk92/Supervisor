@@ -62,7 +62,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-
     private class PostLogin extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -130,7 +129,6 @@ public class LoginActivity extends AppCompatActivity {
 
         }
     }
-
 
     @Override
     protected void onPause() {

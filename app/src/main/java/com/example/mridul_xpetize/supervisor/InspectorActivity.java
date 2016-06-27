@@ -177,6 +177,7 @@ public class InspectorActivity extends AppCompatActivity {
                         }
                     }
                 });
+
                 alertDialogBuilder.setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
 

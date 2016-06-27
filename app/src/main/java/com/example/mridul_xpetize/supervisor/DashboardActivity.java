@@ -24,7 +24,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 public class DashboardActivity extends AppCompatActivity {
 
-    ImageButton view_inspectors, add_inspectors, notification, logout;
+    ImageButton view_inspectors;
     private Drawer result = null;
     PreferencesHelper pref;
 
@@ -96,7 +96,6 @@ public class DashboardActivity extends AppCompatActivity {
         });
     }
 
-    //Alert Dialog
     public void dialogBox() {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Confirm");
