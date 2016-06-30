@@ -17,15 +17,15 @@
             android:padding="16dp">
 
             <EditText
-                android:id="@+id/editText_name"
+                android:id="@+id/editText_subName"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
+                android:layout_margin="3dp"
                 android:background="@drawable/edit_text_style"
-                android:hint="Task Name"
+                android:hint="SubTask Name"
                 android:padding="10dp" />
 
             <EditText
@@ -34,12 +34,34 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/editText_name"
                 android:layout_weight="1"
+                android:layout_below="@+id/editText_subName"
                 android:background="@drawable/edit_text_style"
                 android:hint="Description"
                 android:padding="10dp" />
 
+            <Spinner
+                android:id="@+id/spinner_type"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/editText_desc"
+                android:layout_margin="3dp"
+                android:padding="5dp" />
+
+            <EditText
+                android:id="@+id/editText_Tasks"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/spinner_type"
+                android:layout_margin="3dp"
+                android:background="@drawable/edit_text_style"
+                android:hint="Select Tasks"
+                android:padding="5dp" />
 
             <EditText
                 android:id="@+id/editText_start"
@@ -47,8 +69,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/spinner"
+                android:layout_below="@+id/editText_order"
                 android:layout_marginBottom="3dp"
+                android:layout_marginLeft="3dp"
                 android:layout_marginTop="3dp"
                 android:layout_toLeftOf="@+id/imageButton_startDate"
                 android:layout_toStartOf="@+id/imageButton_startDate"
@@ -61,10 +84,9 @@
                 android:id="@+id/editText_end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
+                android:layout_alignLeft="@+id/editText_start"
+                android:layout_alignStart="@+id/editText_start"
                 android:layout_below="@+id/editText_start"
-                android:layout_marginBottom="3dp"
                 android:layout_toLeftOf="@+id/imageButton_endDate"
                 android:layout_toStartOf="@+id/imageButton_endDate"
                 android:background="@drawable/edit_text_style"
@@ -73,22 +95,25 @@
                 android:padding="5dp" />
 
             <EditText
-                android:id="@+id/editText_location"
+                android:id="@+id/editText_order"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/editText_end"
+                android:layout_below="@+id/editText_Tasks"
+                android:layout_margin="3dp"
                 android:background="@drawable/edit_text_style"
-                android:hint="Location"
+                android:hint="Order"
                 android:padding="5dp" />
 
             <EditText
                 android:id="@+id/editText_comments"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/editText_location"
-                android:layout_marginTop="3dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/editText_end"
+                android:layout_margin="3dp"
                 android:background="@drawable/edit_text_style"
                 android:hint="Comments"
                 android:padding="5dp" />
@@ -97,21 +122,19 @@
                 android:id="@+id/button_add"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_below="@+id/editText_comments"
-                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
                 android:text="Add" />
 
             <ImageButton
                 android:id="@+id/imageButton_startDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignEnd="@+id/spinner_type"
+                android:layout_alignRight="@+id/spinner_type"
+                android:layout_below="@+id/editText_order"
                 android:background="@null"
-                android:src="@drawable/calendar_ic"
-                android:layout_alignTop="@+id/editText_start"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
+                android:src="@drawable/calendar_ic" />
 
             <ImageButton
                 android:id="@+id/imageButton_endDate"
@@ -122,15 +145,6 @@
                 android:layout_toRightOf="@+id/editText_start"
                 android:background="@null"
                 android:src="@drawable/calendar_ic" />
-
-            <Spinner
-                android:id="@+id/spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/editText_desc"
-                android:padding="5dp" />
         </RelativeLayout>
     </LinearLayout>
 </ScrollView>

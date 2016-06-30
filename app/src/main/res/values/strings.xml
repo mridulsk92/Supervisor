@@ -3,8 +3,8 @@
     <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to login -->
-    <!--<string name="url">http://10.0.2.2/</string>-->
-    <string name="url">http://vikray.in/</string>
+    <string name="url">http://10.0.2.2/EagleXpetize/</string>
+    <!--<string name="url">http://vikray.in/</string>-->
 
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>

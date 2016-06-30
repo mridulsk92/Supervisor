@@ -1,125 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:padding="6dp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Description"
-            android:textSize="10sp"
-            android:paddingTop="2dp"
-            android:gravity="center"
-            android:visibility="visible"
-            android:layout_below="@+id/username"
-            android:layout_toRightOf="@+id/taskname"
-            android:layout_toEndOf="@+id/taskname" />
+    <TextView
+        android:id="@+id/taskname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Task Name "
+        android:textStyle="bold"
+        android:textSize="13sp"
+        android:layout_below="@+id/username"
+        android:layout_toRightOf="@+id/username"
+        android:layout_toEndOf="@+id/username" />
 
-        <TextView
-            android:id="@+id/username"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="Username"
-            android:visibility="gone" />
+    <TextView
+        android:id="@+id/desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Description"
+        android:textSize="10sp"
+        android:paddingTop="2dp"
+        android:gravity="center"
+        android:visibility="visible"
+        android:layout_below="@+id/username"
+        android:layout_toRightOf="@+id/taskname"
+        android:layout_toEndOf="@+id/taskname" />
 
-        <TextView
-            android:id="@+id/type"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="Type of task :"
-            android:visibility="gone" />
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Username"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/start"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/desc"
-            android:padding="5dp"
-            android:text="Start Date"
-            android:visibility="gone" />
+    <TextView
+        android:id="@+id/type"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Type of task :"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/end"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/start"
-            android:padding="5dp"
-            android:text="End Date"
-            android:visibility="gone" />
+    <TextView
+        android:id="@+id/start"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/desc"
+        android:padding="5dp"
+        android:text="Start Date"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Location"
-            android:layout_margin="1dp"
-            android:textSize="10sp"
-            android:visibility="visible"
-            android:layout_below="@+id/taskname"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+    <TextView
+        android:id="@+id/end"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/start"
+        android:padding="5dp"
+        android:text="End Date"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/comments"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/desc"
-            android:layout_margin="5dp"
-            android:layout_toEndOf="@+id/username"
-            android:layout_toRightOf="@+id/username"
-            android:text="Comments"
-            android:visibility="gone" />
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location"
+        android:layout_margin="1dp"
+        android:textSize="10sp"
+        android:visibility="visible"
+        android:layout_below="@+id/taskname"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
-        <TextView
-            android:id="@+id/assigned"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Assigned By : "
-            android:visibility="visible"
-            android:textSize="10sp"
-            android:layout_marginLeft="1dp"
-            android:layout_below="@+id/location"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+    <TextView
+        android:id="@+id/comments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/desc"
+        android:layout_margin="5dp"
+        android:layout_toEndOf="@+id/username"
+        android:layout_toRightOf="@+id/username"
+        android:text="Comments"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="Status"
-            android:visibility="gone" />
+    <TextView
+        android:id="@+id/assigned"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Assigned By : "
+        android:visibility="visible"
+        android:textSize="10sp"
+        android:layout_marginLeft="1dp"
+        android:layout_below="@+id/location"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
-        <TextView
-            android:id="@+id/id"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="Id"
-            android:visibility="gone" />
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Status"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/task_id"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="TaskId"
-            android:visibility="gone" />
+    <TextView
+        android:id="@+id/id"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Id"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/taskname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Task Name - "
-            android:textStyle="bold"
-            android:textSize="13sp"
-            android:layout_below="@+id/username"
-            android:layout_toRightOf="@+id/username"
-            android:layout_toEndOf="@+id/username" />
+    <TextView
+        android:id="@+id/task_id"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="TaskId"
+        android:visibility="gone" />
 
-    </RelativeLayout>
+</LinearLayout>

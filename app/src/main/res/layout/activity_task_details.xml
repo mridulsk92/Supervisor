@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="2dp"
+    tools:context="com.example.mridul_xpetize.test.TaskDetailsActivity">
+
+    <RelativeLayout
+        android:id="@+id/logo"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imageView_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:src="@drawable/logo_ic" />
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="fill_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_below="@+id/logo"
+        android:background="@color/background"
+        android:titleTextColor="@color/colorAccent"
+        app:theme="@style/ToolbarColoredBackArrow"
+        app:titleTextColor="@color/colorAccent" />
+
+
+    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/task_details"
+        layout_height="wrap_content"
+        layout_width="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/main"
+        android:layout_below="@id/toolbar"
+        android:layout_marginBottom="5dp"
+        card_view:contentPadding="6dp">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_taskName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_desc"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Description"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/text_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Id"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="10sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/text_startD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="StartDate : "
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/text_endD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EndDate : "
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/text_comments"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Coments"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/text_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/text_assigned"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AssignedBy"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="10sp" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/subTask_details"
+        layout_height="wrap_content"
+        layout_width="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/main"
+        android:layout_below="@id/task_details"
+        android:layout_marginBottom="5dp"
+        card_view:contentPadding="6dp">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButton_addTask"
+                android:layout_gravity="right"
+                android:src="@drawable/add_ic"
+                android:background="@null"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+            <TextView
+                android:id="@+id/empty"
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
+                android:layout_alignEnd="@+id/listView_task"
+                android:layout_alignParentBottom="true"
+                android:layout_alignRight="@+id/listView_task"
+                android:layout_below="@+id/textView_inspector"
+                android:gravity="center"
+                android:text="No SubTasks For this Task" />
+
+            <ListView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/listView_sub"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+</RelativeLayout>

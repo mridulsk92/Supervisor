@@ -24,7 +24,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 public class DashboardActivity extends AppCompatActivity {
 
-    ImageButton view_inspectors;
+    ImageButton view_inspectors, view_workers;
     private Drawer result = null;
     PreferencesHelper pref;
 
@@ -84,6 +84,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         //Initialise
         view_inspectors = (ImageButton) findViewById(R.id.imageButton_inspectors);
+        view_workers = (ImageButton) findViewById(R.id.imageButton_workers);
 
         //onClick of view inspectors
         view_inspectors.setOnClickListener(new View.OnClickListener() {
@@ -91,6 +92,16 @@ public class DashboardActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Intent i = new Intent(DashboardActivity.this, MainActivity.class);
+                startActivity(i);
+            }
+        });
+
+        //onClick of view worker
+        view_workers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent i = new Intent(DashboardActivity.this, WorkerListActivity.class);
                 startActivity(i);
             }
         });

@@ -1,102 +1,71 @@
 package com.example.mridul_xpetize.supervisor;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.Xml;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.Nameable;
-import com.mikepenz.materialize.color.Material;
 
-import org.apache.http.HttpResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-public class MainActivity extends AppCompatActivity {
+public class WorkerListActivity extends AppCompatActivity {
 
     private Drawer result = null;
+
     ProgressDialog pDialog;
+    private static String TAG_INSPECTOR = "insp";
     ArrayList<HashMap<String, String>> dataList;
-    ListView inspector_list;
-    JSONArray tasks;
+    ListView worker_list;
+    JSONArray workers;
     private static String TAG_NAME = "UserName";
     private static String TAG_ID = "UserId";
-    Button add;
     PreferencesHelper pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_worker_list);
 
-        //Initialise toolbar
+        //Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle("Supervisor");
+        toolbar.setTitle("Inspector");
 
-        pref = new PreferencesHelper(MainActivity.this);
+        pref = new PreferencesHelper(WorkerListActivity.this);
         String name = pref.GetPreferences("UserName");
 
-        //Side Drawer
+        //Side Drawer Header
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(name).withEmail(name + "@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
+                        new ProfileDrawerItem().withName(name).withEmail(name+"@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
                 ).build();
 
+        //Side Drawer contents
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withAccountHeader(headerResult)
@@ -107,44 +76,53 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         new SecondaryDrawerItem().withName("About").withIcon(getResources().getDrawable(R.drawable.ic_about)).withSelectable(false),
                         new SecondaryDrawerItem().withName("Log Out").withIcon(getResources().getDrawable(R.drawable.ic_logout)).withSelectable(false)
-                ).build();
+                ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 
+                        if(drawerItem != null){
+
+                        }
+                        return false;
+                    }
+                }).build();
+
+        //ToggleButton on Toolbar
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         result.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
 
-        //Initialise Views
-        add = (Button) findViewById(R.id.button_add);
-        inspector_list = (ListView) findViewById(R.id.inspector_list);
+        //Initialise
         dataList = new ArrayList<HashMap<String, String>>();
-        pref = new PreferencesHelper(MainActivity.this);
+        worker_list = (ListView) findViewById(R.id.listView_workers);
 
-        new GetInspectorList().execute();
+        new GetWorkerList().execute();
 
         //onItem click listener for list items
-        inspector_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        worker_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String name = ((TextView) view.findViewById(R.id.inspector)).getText().toString();
-                String id_insp = ((TextView) view.findViewById(R.id.inspector_id)).getText().toString();
+                String worker_id = ((TextView) view.findViewById(R.id.worker_id)).getText().toString();
 
-                Intent i = new Intent(MainActivity.this, InspectorActivity.class);
-                i.putExtra("name", name);
-                i.putExtra("Id", id_insp);
-                startActivity(i);
+                Intent intent = new Intent(WorkerListActivity.this, WorkerActivity.class);
+                intent.putExtra("name", name);
+                intent.putExtra("id", worker_id);
+                startActivity(intent);
+
             }
         });
     }
 
-    class GetInspectorList extends AsyncTask<Void, Void, Void> {
-
+    private class GetWorkerList extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            // Showing progress dialog
+
             dataList.clear();
-            pDialog = new ProgressDialog(MainActivity.this);
+            // Showing progress dialog
+            pDialog = new ProgressDialog(WorkerListActivity.this);
             pDialog.setMessage("Please wait...");
             pDialog.setCancelable(false);
             pDialog.show();
@@ -152,22 +130,24 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
-            String url = getString(R.string.url) + "EagleXpetizeService.svc/UsersListByType/Inspector";
+
+            String url = getString(R.string.url)+"EagleXpetizeService.svc/UsersListByType/Worker";
+
+            // Making a request to url and getting response
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
 
             Log.d("Response: ", "> " + jsonStr);
 
             if (jsonStr != null) {
-
                 try {
 
-                    tasks = new JSONArray(jsonStr);
+                    workers = new JSONArray(jsonStr);
+
                     // looping through Array
-                    for (int i = 0; i < tasks.length(); i++) {
-                        JSONObject c = tasks.getJSONObject(i);
+                    for (int i = 0; i < workers.length(); i++) {
+                        JSONObject c = workers.getJSONObject(i);
 
                         String id = c.getString(TAG_ID);
                         String name = c.getString(TAG_NAME);
@@ -176,10 +156,10 @@ public class MainActivity extends AppCompatActivity {
                         // tmp hashmap for single contact
                         HashMap<String, String> contact = new HashMap<String, String>();
 
-                        // adding each child node to HashMap key => value`
-                        contact.put(TAG_NAME, name);
-                        contact.put("Type", type);
-                        contact.put(TAG_ID, id);
+                        // adding each child node to HashMap key => value
+                        contact.put(TAG_INSPECTOR, name);
+                        contact.put(TAG_ID,id);
+                        contact.put("Type",type);
                         dataList.add(contact);
 
                     }
@@ -201,18 +181,13 @@ public class MainActivity extends AppCompatActivity {
                 pDialog.dismiss();
 
             ListAdapter adapter = new SimpleAdapter(
-                    MainActivity.this, dataList,
-                    R.layout.layout_inspector, new String[]{TAG_NAME, TAG_ID, "Type"}, new int[]{R.id.inspector, R.id.inspector_id, R.id.type
+                    WorkerListActivity.this, dataList,
+                    R.layout.layout_worker, new String[]{TAG_INSPECTOR, TAG_ID,"Type"}, new int[]{R.id.inspector,R.id.worker_id,R.id.type
             });
 
-            inspector_list.setAdapter(adapter);
-
-//            setData();
-//            adapter = new ListViewAdapter(MainActivity.this, R.layout.layout_inspector, stringArrayList);
-//            inspector_list.setAdapter(adapter);
+            worker_list.setAdapter(adapter);
         }
     }
-
 
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -236,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
 
-                Intent i = new Intent(MainActivity.this, NotificationActivity.class);
+                Intent i = new Intent(WorkerListActivity.this, NotificationActivity.class);
                 startActivity(i);
                 return false;
             }
@@ -244,28 +219,4 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        //add the values which need to be saved from the drawer to the bundle
-        outState = result.saveInstanceState(outState);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                if (!result.isDrawerOpen()) {
-                    result.openDrawer();
-                } else {
-                    result.closeDrawer();
-                }
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
 }
