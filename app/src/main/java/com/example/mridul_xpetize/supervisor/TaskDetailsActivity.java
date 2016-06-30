@@ -572,7 +572,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
             if (convertView == null) {
 
                 //inflate the custom layout
-                convertView = inflater.from(parent.getContext()).inflate(R.layout.task_list, parent, false);
+                convertView = inflater.from(parent.getContext()).inflate(R.layout.tasklist, parent, false);
                 viewHolder = new ViewHolder();
 
                 //cache the views

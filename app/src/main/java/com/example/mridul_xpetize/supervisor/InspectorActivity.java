@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -145,6 +146,30 @@ public class InspectorActivity extends AppCompatActivity {
         added_list = (ListView) findViewById(R.id.listView_task);
         dataList = new ArrayList<>();
         inspector = (TextView) findViewById(R.id.textView_inspector);
+
+        //onItemClick Listener of listview
+        added_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                //Get TextView values and assign to String
+                String idTask = ((TextView) view.findViewById(R.id.task_id)).getText().toString();
+                String name = ((TextView) view.findViewById(R.id.taskname)).getText().toString();
+                String comments = ((TextView) view.findViewById(R.id.comments)).getText().toString();
+                String desc = ((TextView) view.findViewById(R.id.desc)).getText().toString();
+                String assignedBy = ((TextView) view.findViewById(R.id.assigned)).getText().toString();
+                String status = ((TextView) view.findViewById(R.id.status)).getText().toString();
+
+                Intent i = new Intent(InspectorActivity.this, TaskDetailsActivity.class);
+                i.putExtra("Id", idTask);
+                i.putExtra("Name", name);
+                i.putExtra("Status", status);
+                i.putExtra("Comments", comments);
+                i.putExtra("Description", desc);
+                i.putExtra("AssignedBy", assignedBy);
+                startActivity(i);
+            }
+        });
 
         //Get Inspector name and display it
         Intent i = getIntent();
