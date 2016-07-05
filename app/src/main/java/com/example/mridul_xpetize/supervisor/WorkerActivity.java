@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -46,6 +47,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -183,6 +185,51 @@ public class WorkerActivity extends AppCompatActivity {
         empty = (TextView) findViewById(R.id.empty);
         added_list = (ListView) findViewById(R.id.listView_task);
         workerName.setText(name);
+
+        //onItemClick of ListView item
+        task_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String name_st = ((TextView) view.findViewById(R.id.subName)).getText().toString();
+                String comments_st = ((TextView) view.findViewById(R.id.comments)).getText().toString();
+                String desc_st = ((TextView) view.findViewById(R.id.desc)).getText().toString();
+                String status_st = ((TextView) view.findViewById(R.id.status)).getText().toString();
+                String assigned_st = ((TextView) view.findViewById(R.id.assigned)).getText().toString();
+
+                LayoutInflater factory = LayoutInflater.from(WorkerActivity.this);
+                final View addView = factory.inflate(
+                        R.layout.dialog_taskdetails, null);
+                final AlertDialog detailDialog = new AlertDialog.Builder(WorkerActivity.this).create();
+                detailDialog.setView(addView);
+
+                //Initialise
+                TextView subName = (TextView) addView.findViewById(R.id.view_subName);
+                TextView desc = (TextView) addView.findViewById(R.id.view_description);
+                TextView comments = (TextView) addView.findViewById(R.id.view_comments);
+                TextView status = (TextView) addView.findViewById(R.id.view_status);
+                TextView assigned = (TextView) addView.findViewById(R.id.view_assigned);
+                ImageButton close = (ImageButton) addView.findViewById(R.id.imageButton_close);
+
+                //SetTextValues
+                subName.setText(name_st);
+                desc.setText("Description : " + desc_st);
+                comments.setText("Comments : " + comments_st);
+                status.setText("Status : " + status_st);
+                assigned.setText("Assigned By : " + assigned_st);
+
+                //ok button onClick
+                close.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        detailDialog.dismiss();
+                    }
+                });
+
+                detailDialog.show();
+            }
+        });
 
         //Show new Subtask List
         new GetSubTaskList().execute("User");
@@ -580,7 +627,7 @@ public class WorkerActivity extends AppCompatActivity {
         //class for caching the views in a row
         private class ViewHolder {
 
-            TextView comments, desc, priority, startdate, enddate, jobOrder, statusId, id, subId, createdBy, subName, isSub;
+            TextView comments, desc, priority, startdate, enddate, jobOrder, statusId, id, subId, createdBy, subName, isSub, status, assignedBy;
             CardView cv;
         }
 
@@ -597,6 +644,8 @@ public class WorkerActivity extends AppCompatActivity {
                 viewHolder = new ViewHolder();
 
                 //cache the views
+                viewHolder.status = (TextView) convertView.findViewById(R.id.status);
+                viewHolder.assignedBy = (TextView) convertView.findViewById(R.id.assigned);
                 viewHolder.subName = (TextView) convertView.findViewById(R.id.subName);
                 viewHolder.createdBy = (TextView) convertView.findViewById(R.id.createdBy);
                 viewHolder.subId = (TextView) convertView.findViewById(R.id.subtask_id);
@@ -619,7 +668,9 @@ public class WorkerActivity extends AppCompatActivity {
             viewHolder.subName.setText(dataList.get(position).get("TaskName").toString());
             viewHolder.createdBy.setText(dataList.get(position).get("CreatedBy").toString());
             viewHolder.comments.setText(dataList.get(position).get("Comments").toString());
-//            viewHolder.desc.setText(dataList.get(position).get("Description").toString());
+            viewHolder.desc.setText(dataList.get(position).get("TaskDescription").toString());
+            viewHolder.status.setText(dataList.get(position).get("Status").toString());
+            viewHolder.assignedBy.setText(dataList.get(position).get("AssignedByName").toString());
 //            viewHolder.priority.setText(dataList.get(position).get("Priority").toString());
 //            viewHolder.startdate.setText(dataList.get(position).get("TaskStartDate").toString());
 //            viewHolder.enddate.setText(dataList.get(position).get("TaskEndDate").toString());
@@ -712,25 +763,25 @@ public class WorkerActivity extends AppCompatActivity {
 
                                 String id = c.getString("TaskId");
                                 String name = c.getString("TaskName");
-//                            String desc = c.getString("Description");
+                                String desc = c.getString("TaskDescription");
                                 String comments = c.getString("Comments");
                                 String isSub = c.getString("IsSubTask");
-//                            String priority = c.getString("Priority");
+                                String status = c.getString("Status");
                                 String createdBy = c.getString("CreatedBy");
                                 int statusId = c.getInt("StatusId");
-//                            int subId = c.getInt("SubTaskId");
+                                String assignedBy = c.getString("AssignedByName");
 
                                 //adding each child node to HashMap key => value
                                 HashMap<String, Object> taskMap = new HashMap<String, Object>();
-//                            taskMap.put("Description", "Description : " + desc);
+                                taskMap.put("TaskDescription", desc);
                                 taskMap.put("CreatedBy", createdBy);
                                 taskMap.put("TaskId", id);
                                 taskMap.put("TaskName", name);
                                 taskMap.put("IsSub", isSub);
-//                            taskMap.put("SubTaskId", subId);
+                                taskMap.put("AssignedByName", assignedBy);
                                 taskMap.put("StatusId", statusId);
                                 taskMap.put("Comments", comments);
-//                            contact.put("Priority", "Priority : " + priority);
+                                taskMap.put("Status", status);
 
                                 dataList.add(taskMap);
 
