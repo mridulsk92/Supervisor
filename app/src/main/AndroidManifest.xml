@@ -27,20 +27,21 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.mridul_xpetize.supervisor.NotificationActivity" />
         </activity>
-        <activity android:name=".SplashActivity"
+        <activity
+            android:name=".SplashActivity"
             android:label="Supervisor EagleXpetize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".LoginActivity" />
         <activity android:name=".WorkerActivity" />
         <activity android:name=".WorkerListActivity" />
-        <activity android:name=".DashboardActivity"></activity>
-        <activity android:name=".TaskDetailsActivity"></activity>
-
+        <activity android:name=".DashboardActivity" />
+        <activity android:name=".TaskDetailsActivity" />
+        <activity android:name=".ApprovalActivity"></activity>
     </application>
 
 </manifest>

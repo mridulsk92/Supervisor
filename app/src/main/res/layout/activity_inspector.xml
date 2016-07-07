@@ -69,10 +69,10 @@
             android:id="@+id/listView_task"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_above="@+id/fab"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/textView_inspector" />
+            android:layout_below="@+id/textView_inspector"
+            android:layout_alignBottom="@+id/empty" />
 
         <TextView
             android:id="@+id/empty"
@@ -81,21 +81,24 @@
             android:layout_alignEnd="@+id/listView_task"
             android:layout_alignParentBottom="true"
             android:layout_alignRight="@+id/listView_task"
-            android:layout_below="@+id/toolbar"
             android:gravity="center"
-            android:text="No Tasks Assigned" />
+            android:text="No Tasks Assigned"
+            android:layout_below="@+id/textView_inspector" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/listView_task"
-            android:layout_alignParentBottom="true"
-            android:layout_alignRight="@+id/listView_task"
             android:layout_gravity="bottom|end"
+            android:layout_margin="3dp"
             android:background="@null"
+            app:fabSize="mini"
+            android:scaleType="center"
             android:src="@android:drawable/ic_input_add"
-            android:tint="@color/cardview_light_background" />
+            android:tint="@color/cardview_light_background"
+            android:layout_alignBottom="@+id/listView_task"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 </RelativeLayout>

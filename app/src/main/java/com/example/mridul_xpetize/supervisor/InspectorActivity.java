@@ -187,7 +187,6 @@ public class InspectorActivity extends AppCompatActivity {
 
                 //Show DialogBox
                 final android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(InspectorActivity.this);
-                alertDialogBuilder.setTitle("Select a Task");
                 final CharSequence items[] = {"Select Pre Defined tasks", "Create Tasks"};
                 alertDialogBuilder.setItems(items, new DialogInterface.OnClickListener() {
                     @Override
