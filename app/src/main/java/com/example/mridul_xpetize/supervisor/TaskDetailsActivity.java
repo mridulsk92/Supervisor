@@ -1,13 +1,16 @@
 package com.example.mridul_xpetize.supervisor;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -26,13 +29,16 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
@@ -51,6 +57,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -67,7 +74,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
     View empty;
 
     String desc, stdate, enddate, worker_id, comments_st, order_st, name_st;
-    int priority;
+    int priority, response_json;
+    String super_id, taskId_history;
 
     Calendar myCalendarS, myCalendarE;
     EditText startDate, endDate;
@@ -75,9 +83,9 @@ public class TaskDetailsActivity extends AppCompatActivity {
     CustomAdapter cardAdapter;
     EditText task_select;
 
-    ImageButton addSubTask;
+    FloatingActionButton addSubTask;
     JSONArray tasks;
-    String selected_task, selected_task_id;
+    String selected_task, selected_task_id, new_subTaskId;
 
     List<String> popupList = new ArrayList<String>();
     List<String> popupListId = new ArrayList<String>();
@@ -85,6 +93,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
     ProgressDialog pDialog;
 
     ArrayList<HashMap<String, Object>> dataList;
+    SharedPreferences prefNew;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,9 +106,11 @@ public class TaskDetailsActivity extends AppCompatActivity {
         toolbar.setTitle("Inspector");
 
         //Get Preference Values
+        prefNew = getSharedPreferences("LangPref", Activity.MODE_PRIVATE);
         pref = new PreferencesHelper(TaskDetailsActivity.this);
         UserName = pref.GetPreferences("UserName");
         UserId = pref.GetPreferences("UserId");
+        super_id = UserId;
 
         //Adding Header to the Navigation Drawer
         AccountHeader headerResult = new AccountHeaderBuilder()
@@ -109,17 +120,83 @@ public class TaskDetailsActivity extends AppCompatActivity {
                         new ProfileDrawerItem().withName(UserName).withEmail(UserName + "@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
                 ).build();
 
-        //Drawer
+        //Side Drawer contents
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withAccountHeader(headerResult)
                 .withToolbar(toolbar)
                 .withTranslucentStatusBar(false)
+                .withSelectedItem(-1)
                 .withDisplayBelowStatusBar(true)
                 .addDrawerItems(
-                        new SecondaryDrawerItem().withName("About").withIcon(getResources().getDrawable(R.drawable.ic_about)).withSelectable(false),
-                        new SecondaryDrawerItem().withName("Log Out").withIcon(getResources().getDrawable(R.drawable.ic_logout)).withSelectable(false)
-                ).build();
+                        new SecondaryDrawerItem().withName(R.string.About).withIcon(getResources().getDrawable(R.drawable.ic_about)).withSelectable(false),
+                        new PrimaryDrawerItem().withName(getString(R.string.Language)).withIcon(getResources().getDrawable(R.drawable.language_switch_ic)).withIdentifier(3).withSelectable(false),
+                        new SecondaryDrawerItem().withName(R.string.LogOut).withIcon(getResources().getDrawable(R.drawable.ic_logout)).withSelectable(false)
+                ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+
+                        if (drawerItem != null) {
+                            if (drawerItem.getIdentifier() == 1) {
+
+                                //Clicked About
+
+                            } else if (drawerItem.getIdentifier() == 2) {
+
+                                //Clicked LogOut
+
+                            } else if (drawerItem.getIdentifier() == 3) {
+
+                                SharedPreferences sp = getSharedPreferences("LangPref", Activity.MODE_PRIVATE);
+                                int selection = sp.getInt("LanguageSelect", -1);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(TaskDetailsActivity.this);
+                                CharSequence[] array = {"English", "Japanese"};
+                                builder.setTitle("Select Language")
+                                        .setSingleChoiceItems(array, selection, new DialogInterface.OnClickListener() {
+
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                                if (which == 1) {
+                                                    String lang = "ja";
+                                                    pref.SavePreferences("Language", lang);
+                                                    SharedPreferences.Editor editor = prefNew.edit();
+                                                    editor.putInt("LanguageSelect", which);
+                                                    editor.commit();
+                                                    changeLang(lang);
+                                                } else {
+                                                    String lang = "en";
+                                                    pref.SavePreferences("Language", lang);
+                                                    SharedPreferences.Editor editor = prefNew.edit();
+                                                    editor.putInt("LanguageSelect", which);
+                                                    editor.commit();
+                                                    changeLang(lang);
+                                                }
+                                            }
+                                        })
+
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                // User clicked OK, so save the result somewhere
+
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int id) {
+
+                                            }
+                                        });
+
+                                builder.create();
+                                builder.show();
+                            }
+                        }
+                        return false;
+                    }
+                })
+                .build();
 
         //Add ToggleButton to ToolBar
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -136,7 +213,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
         //Initialise
         dataList = new ArrayList<>();
-        addSubTask = (ImageButton) findViewById(R.id.imageButton_addTask);
+        addSubTask = (FloatingActionButton) findViewById(R.id.fab);
         viewList = (ListView) findViewById(R.id.listView_sub);
         TextView viewId = (TextView) findViewById(R.id.text_id);
         TextView viewName = (TextView) findViewById(R.id.text_taskName);
@@ -233,7 +310,6 @@ public class TaskDetailsActivity extends AppCompatActivity {
         final EditText comments = (EditText) addView.findViewById(R.id.editText_comments);
         final EditText order = (EditText) addView.findViewById(R.id.editText_order);
         task_select = (EditText) addView.findViewById(R.id.editText_Tasks);
-        task_select.setVisibility(View.GONE);
 
         task_select.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -428,6 +504,137 @@ public class TaskDetailsActivity extends AppCompatActivity {
         }
     }
 
+    private class PostHistory extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(TaskDetailsActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+
+            String historyDate = getCurrentTimeStamp();
+            String status = params[0];
+            String user_name = pref.GetPreferences("UserName");
+            String createdbyId = pref.GetPreferences("UserId");
+
+            HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/NewHistory");
+            request.setHeader("Accept", "application/json");
+            request.setHeader("Content-type", "application/json");
+
+            JSONStringer userJson = null;
+
+            if (status.equals("Assigned")) {
+                // Build JSON string
+                try {
+                    userJson = new JSONStringer()
+                            .object()
+                            .key("history")
+                            .object()
+                            .key("TaskId").value(taskId_history)
+                            .key("IsSubTask").value(1)
+                            .key("Notes").value("Assigned By : " + user_name)
+                            .key("Comments").value(status)
+//                        .key("HistoryDate").value(historyDate)
+//                        .key("CreatedDate").value(createdDate)
+                            .key("CreatedBy").value(super_id)
+                            .endObject()
+                            .endObject();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                // Build JSON string
+                try {
+                    userJson = new JSONStringer()
+                            .object()
+                            .key("history")
+                            .object()
+                            .key("TaskId").value(new_subTaskId)
+                            .key("IsSubTask").value(1)
+                            .key("Notes").value("Created By : " + user_name)
+                            .key("Comments").value(status)
+//                        .key("HistoryDate").value(historyDate)
+//                        .key("CreatedDate").value(createdDate)
+                            .key("CreatedBy").value(super_id)
+                            .endObject()
+                            .endObject();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Log.d("Json", String.valueOf(userJson));
+
+            StringEntity entity = null;
+            try {
+                entity = new StringEntity(userJson.toString(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+            entity.setContentType("application/json");
+
+            request.setEntity(entity);
+
+            // Send request to WCF service
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            try {
+                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+                String response = httpClient.execute(request, responseHandler);
+
+                Log.d("res", response);
+
+                if (response != null) {
+
+                    try {
+
+                        //Get Data from Json
+                        JSONObject jsonObject = new JSONObject(response);
+
+                        String message = jsonObject.getString("NewHistoryResult");
+
+                        //Save userid and username if success
+                        if (message.equals("success")) {
+                            response_json = 200;
+                        } else {
+                            response_json = 201;
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            if (response_json == 200) {
+                Toast.makeText(TaskDetailsActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                new GetSubTaskList().execute("List");
+            } else {
+                Toast.makeText(TaskDetailsActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private class AssignTask extends AsyncTask<ArrayList<String>, Void, ArrayList<String>> {
 
         @Override
@@ -451,6 +658,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
             String status_st = passed.get(3);
             String comments_st = passed.get(4);
             String insp_id = pref.GetPreferences("UserId");
+            taskId_history = taskid_st;
 
             HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/AssignTask");
             request.setHeader("Accept", "application/json");
@@ -508,7 +716,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
             if (pDialog.isShowing())
                 pDialog.dismiss();
 
-            new GetSubTaskList().execute("List");
+           new PostHistory().execute("Assigned");
 
         }
     }
@@ -533,6 +741,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
             request.setHeader("Content-type", "application/json");
 
             String insp_id = pref.GetPreferences("UserId");
+            String current_time = getCurrentTimeStamp();
 
             // Build JSON string
             JSONStringer userJson = null;
@@ -544,6 +753,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
                         .key("TaskId").value(Taskid)
                         .key("SubTaskName").value(name_st)
                         .key("Description").value(desc)
+                        .key("CreatedDateStr").value(current_time)
+                        .key("ModifiedDateStr").value(current_time)
                         .key("TaskOrder").value(order_st)
                         .key("StatusId").value("1")
                         .key("PriorityId").value(priority)
@@ -574,6 +785,19 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 ResponseHandler<String> responseHandler = new BasicResponseHandler();
                 String response = httpClient.execute(request, responseHandler);
                 Log.d("res", response);
+
+                if (response != null) {
+
+                    try {
+
+                        //Get Data from Json
+                        JSONObject jsonObject = new JSONObject(response);
+                        new_subTaskId = jsonObject.getString("NewSubTaskResult");
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -589,7 +813,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 pDialog.dismiss();
 
             //Show new Subtask List
-            new GetSubTaskList().execute("List");
+            new PostHistory().execute("Created");
 
         }
     }
@@ -883,6 +1107,13 @@ public class TaskDetailsActivity extends AppCompatActivity {
         }
     }
 
+    public static String getCurrentTimeStamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date now = new Date();
+        String strDate = sdf.format(now);
+        return strDate;
+    }
+
     private void updateLabelStart() {
 
         String myFormat = "yyyy/MM/dd";
@@ -934,5 +1165,30 @@ public class TaskDetailsActivity extends AppCompatActivity {
         });
 
         return true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        super.finish();
+    }
+
+    public void changeLang(String lang) {
+
+        if (lang.equalsIgnoreCase(""))
+            return;
+        Locale myLocale = new Locale(lang);
+//        saveLocale(lang);
+        Locale.setDefault(myLocale);
+        android.content.res.Configuration config = new android.content.res.Configuration();
+        config.locale = myLocale;
+        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+        updateTexts();
+    }
+
+    private void updateTexts() {
+
+        Intent i = new Intent(TaskDetailsActivity.this, TaskDetailsActivity.class);
+        startActivity(i);
     }
 }

@@ -82,7 +82,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignRight="@+id/listView_task"
             android:gravity="center"
-            android:text="No Tasks Assigned"
+            android:text="No Tasks To Show"
             android:layout_below="@+id/textView_inspector" />
 
         <android.support.design.widget.FloatingActionButton

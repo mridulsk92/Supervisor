@@ -1,15 +1,23 @@
 package com.example.mridul_xpetize.supervisor;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,16 +32,22 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import org.apache.http.client.ResponseHandler;
@@ -47,13 +61,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -66,8 +80,15 @@ public class WorkerActivity extends AppCompatActivity {
     ImageButton startCal, endCal;
     PreferencesHelper pref;
     View empty;
+    MenuItem menuItem;
+    int count, response_json;
+    ListView hidden_not;
+    List<Integer> posList = new ArrayList<Integer>();
+    ArrayList<Integer> savedList = new ArrayList<Integer>();
 
     String desc, stdate, enddate, worker_id, comments_st, order_st, name_st;
+    String taskId_history, createdBy_history;
+    String insp_id;
     int priority;
 
     Calendar myCalendarS, myCalendarE;
@@ -75,6 +96,7 @@ public class WorkerActivity extends AppCompatActivity {
     LayoutInflater inflater;
     CustomAdapter cardAdapter;
     EditText task_select;
+    String current_time, new_subTaskId;
 
     ListView added_list;
     JSONArray tasks;
@@ -84,8 +106,11 @@ public class WorkerActivity extends AppCompatActivity {
     List<String> popupListId = new ArrayList<String>();
 
     ProgressDialog pDialog;
+    ProgressDialog pDialogN;
 
     ArrayList<HashMap<String, Object>> dataList;
+    ArrayList<HashMap<String, Object>> notiList;
+    SharedPreferences prefNew;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +122,11 @@ public class WorkerActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle("Inspector");
 
+        prefNew = getSharedPreferences("LangPref", Activity.MODE_PRIVATE);
         pref = new PreferencesHelper(WorkerActivity.this);
         String uname = pref.GetPreferences("UserName");
+        insp_id = pref.GetPreferences("UserId");
+
 
         //Side Drawer Header
         AccountHeader headerResult = new AccountHeaderBuilder()
@@ -117,18 +145,74 @@ public class WorkerActivity extends AppCompatActivity {
                 .withSelectedItem(-1)
                 .withDisplayBelowStatusBar(true)
                 .addDrawerItems(
-                        new SecondaryDrawerItem().withName("About").withIcon(getResources().getDrawable(R.drawable.ic_about)).withSelectable(false),
-                        new SecondaryDrawerItem().withName("Log Out").withIcon(getResources().getDrawable(R.drawable.ic_logout)).withSelectable(false)
+                        new SecondaryDrawerItem().withName(R.string.About).withIcon(getResources().getDrawable(R.drawable.ic_about)).withSelectable(false),
+                        new PrimaryDrawerItem().withName(getString(R.string.Language)).withIcon(getResources().getDrawable(R.drawable.language_switch_ic)).withIdentifier(3).withSelectable(false),
+                        new SecondaryDrawerItem().withName(R.string.LogOut).withIcon(getResources().getDrawable(R.drawable.ic_logout)).withSelectable(false)
                 ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 
                         if (drawerItem != null) {
+                            if (drawerItem.getIdentifier() == 1) {
 
+                                //Clicked About
+
+                            } else if (drawerItem.getIdentifier() == 2) {
+
+                                //Clicked LogOut
+
+                            } else if (drawerItem.getIdentifier() == 3) {
+
+                                SharedPreferences sp = getSharedPreferences("LangPref", Activity.MODE_PRIVATE);
+                                int selection = sp.getInt("LanguageSelect", -1);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(WorkerActivity.this);
+                                CharSequence[] array = {"English", "Japanese"};
+                                builder.setTitle("Select Language")
+                                        .setSingleChoiceItems(array, selection, new DialogInterface.OnClickListener() {
+
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                                if (which == 1) {
+                                                    String lang = "ja";
+                                                    pref.SavePreferences("Language", lang);
+                                                    SharedPreferences.Editor editor = prefNew.edit();
+                                                    editor.putInt("LanguageSelect", which);
+                                                    editor.commit();
+                                                    changeLang(lang);
+                                                } else {
+                                                    String lang = "en";
+                                                    pref.SavePreferences("Language", lang);
+                                                    SharedPreferences.Editor editor = prefNew.edit();
+                                                    editor.putInt("LanguageSelect", which);
+                                                    editor.commit();
+                                                    changeLang(lang);
+                                                }
+                                            }
+                                        })
+
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                // User clicked OK, so save the result somewhere
+
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int id) {
+
+                                            }
+                                        });
+
+                                builder.create();
+                                builder.show();
+                            }
                         }
                         return false;
                     }
-                }).build();
+                })
+                .build();
 
         //ToggleButton on Toolbar
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -177,62 +261,106 @@ public class WorkerActivity extends AppCompatActivity {
         worker_id = i.getStringExtra("id");
 
         //Initialize
+        current_time = getCurrentTimeStamp();
+        hidden_not = (ListView) findViewById(R.id.listView_hidden_notification);
         empty = findViewById(R.id.empty);
         workerName = (TextView) findViewById(R.id.textView_inspector);
         task_list = (ListView) findViewById(R.id.listView_task);
         task_list.setEmptyView(findViewById(android.R.id.empty));
         dataList = new ArrayList<>();
+        notiList = new ArrayList<>();
         empty = (TextView) findViewById(R.id.empty);
         added_list = (ListView) findViewById(R.id.listView_task);
         workerName.setText(name);
+
+        //Get Saved List
+//        TinyDB db = new TinyDB(WorkerActivity.this);
+//        savedList = db.getListInt("Positions");
+
+        //onItemClick of ListView item
+        hidden_not.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                count--;
+                if (count <= 0) {
+                    count = 0;
+                }
+
+                menuItem.setIcon(buildCounterDrawable(count, R.drawable.blue_bell_small));
+
+                parent.getChildAt(position).setBackgroundColor(Color.TRANSPARENT);
+                String desc = ((TextView) view.findViewById(R.id.textview_noti)).getText().toString();
+                String byId = ((TextView) view.findViewById(R.id.noti_by)).getText().toString();
+                Intent i = new Intent(WorkerActivity.this, NotificationActivity.class);
+                i.putExtra("Description", desc);
+                i.putExtra("ById", byId);
+                startActivity(i);
+            }
+        });
 
         //onItemClick of ListView item
         task_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                String sub_id = ((TextView) view.findViewById(R.id.task_id)).getText().toString();
                 String name_st = ((TextView) view.findViewById(R.id.subName)).getText().toString();
                 String comments_st = ((TextView) view.findViewById(R.id.comments)).getText().toString();
                 String desc_st = ((TextView) view.findViewById(R.id.desc)).getText().toString();
                 String status_st = ((TextView) view.findViewById(R.id.status)).getText().toString();
                 String assigned_st = ((TextView) view.findViewById(R.id.assigned)).getText().toString();
 
-                LayoutInflater factory = LayoutInflater.from(WorkerActivity.this);
-                final View addView = factory.inflate(
-                        R.layout.dialog_taskdetails, null);
-                final AlertDialog detailDialog = new AlertDialog.Builder(WorkerActivity.this).create();
-                detailDialog.setView(addView);
 
-                //Initialise
-                TextView subName = (TextView) addView.findViewById(R.id.view_subName);
-                TextView desc = (TextView) addView.findViewById(R.id.view_description);
-                TextView comments = (TextView) addView.findViewById(R.id.view_comments);
-                TextView status = (TextView) addView.findViewById(R.id.view_status);
-                TextView assigned = (TextView) addView.findViewById(R.id.view_assigned);
-                ImageButton close = (ImageButton) addView.findViewById(R.id.imageButton_close);
+                Intent i = new Intent(WorkerActivity.this, SubTaskDetailsActivity.class);
+                i.putExtra("SubName", name_st);
+                i.putExtra("SubId", sub_id);
+                Log.d("SubId", sub_id);
+                i.putExtra("Comments", comments_st);
+                i.putExtra("Desc", desc_st);
+                i.putExtra("Status", status_st);
+                i.putExtra("Assigned", assigned_st);
+                startActivity(i);
 
-                //SetTextValues
-                subName.setText(name_st);
-                desc.setText("Description : " + desc_st);
-                comments.setText("Comments : " + comments_st);
-                status.setText("Status : " + status_st);
-                assigned.setText("Assigned By : " + assigned_st);
 
-                //ok button onClick
-                close.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        detailDialog.dismiss();
-                    }
-                });
-
-                detailDialog.show();
+//                LayoutInflater factory = LayoutInflater.from(WorkerActivity.this);
+//                final View addView = factory.inflate(
+//                        R.layout.dialog_taskdetails, null);
+//                final AlertDialog detailDialog = new AlertDialog.Builder(WorkerActivity.this).create();
+//                detailDialog.setView(addView);
+//
+//                //Initialise
+//                TextView subName = (TextView) addView.findViewById(R.id.view_subName);
+//                TextView desc = (TextView) addView.findViewById(R.id.view_description);
+//                TextView comments = (TextView) addView.findViewById(R.id.view_comments);
+//                TextView status = (TextView) addView.findViewById(R.id.view_status);
+//                TextView assigned = (TextView) addView.findViewById(R.id.view_assigned);
+//                ImageButton close = (ImageButton) addView.findViewById(R.id.imageButton_close);
+//
+//                //SetTextValues
+//                subName.setText(name_st);
+//                desc.setText("Description : " + desc_st);
+//                comments.setText("Comments : " + comments_st);
+//                status.setText("Status : " + status_st);
+//                assigned.setText("Assigned By : " + assigned_st);
+//
+//                //ok button onClick
+//                close.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//
+//                        detailDialog.dismiss();
+//                    }
+//                });
+//
+//                detailDialog.show();
             }
         });
 
         //Show new Subtask List
         new GetSubTaskList().execute("User");
+
+        new GetNotiList().execute();
 
     }
 
@@ -451,6 +579,137 @@ public class WorkerActivity extends AppCompatActivity {
         }
     }
 
+    private class PostHistory extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(WorkerActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+
+            String historyDate = getCurrentTimeStamp();
+            String status = params[0];
+            String user_name = pref.GetPreferences("UserName");
+            String createdbyId = pref.GetPreferences("UserId");
+
+            HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/NewHistory");
+            request.setHeader("Accept", "application/json");
+            request.setHeader("Content-type", "application/json");
+
+            JSONStringer userJson = null;
+
+            if (status.equals("Assigned")) {
+                // Build JSON string
+                try {
+                    userJson = new JSONStringer()
+                            .object()
+                            .key("history")
+                            .object()
+                            .key("TaskId").value(taskId_history)
+                            .key("IsSubTask").value(1)
+                            .key("Notes").value("Assigned By : " + user_name)
+                            .key("Comments").value(status)
+//                        .key("HistoryDate").value(historyDate)
+//                        .key("CreatedDate").value(createdDate)
+                            .key("CreatedBy").value(insp_id)
+                            .endObject()
+                            .endObject();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                // Build JSON string
+                try {
+                    userJson = new JSONStringer()
+                            .object()
+                            .key("history")
+                            .object()
+                            .key("TaskId").value(new_subTaskId)
+                            .key("IsSubTask").value(1)
+                            .key("Notes").value("Created By : " + user_name)
+                            .key("Comments").value(status)
+//                        .key("HistoryDate").value(historyDate)
+//                        .key("CreatedDate").value(createdDate)
+                            .key("CreatedBy").value(insp_id)
+                            .endObject()
+                            .endObject();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Log.d("Json", String.valueOf(userJson));
+
+            StringEntity entity = null;
+            try {
+                entity = new StringEntity(userJson.toString(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+            entity.setContentType("application/json");
+
+            request.setEntity(entity);
+
+            // Send request to WCF service
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            try {
+                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+                String response = httpClient.execute(request, responseHandler);
+
+                Log.d("res", response);
+
+                if (response != null) {
+
+                    try {
+
+                        //Get Data from Json
+                        JSONObject jsonObject = new JSONObject(response);
+
+                        String message = jsonObject.getString("NewHistoryResult");
+
+                        //Save userid and username if success
+                        if (message.equals("success")) {
+                            response_json = 200;
+                        } else {
+                            response_json = 201;
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            if (response_json == 200) {
+                Toast.makeText(WorkerActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                new GetSubTaskList().execute("User");
+            } else {
+                Toast.makeText(WorkerActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private class AssignTask extends AsyncTask<ArrayList<String>, Void, ArrayList<String>> {
 
         @Override
@@ -473,6 +732,8 @@ public class WorkerActivity extends AppCompatActivity {
             String status_st = passed.get(3);
             String comments_st = passed.get(4);
             String insp_id = pref.GetPreferences("UserId");
+            taskId_history = taskid_st;
+            createdBy_history = createdBy_st;
 
             HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/AssignTask");
             request.setHeader("Accept", "application/json");
@@ -488,6 +749,7 @@ public class WorkerActivity extends AppCompatActivity {
                         .key("TaskId").value(taskid_st)
                         .key("AssignedToId").value(userId_st)
                         .key("AssignedById").value(insp_id)
+                        .key("AssignedDateStr").value(current_time)
                         .key("StatusId").value(status_st)
                         .key("IsSubTask").value(1)
                         .key("Comments").value(comments_st)
@@ -530,7 +792,7 @@ public class WorkerActivity extends AppCompatActivity {
             if (pDialog.isShowing())
                 pDialog.dismiss();
 
-            new GetSubTaskList().execute("User");
+            new PostHistory().execute("Assigned");
 
         }
     }
@@ -554,8 +816,6 @@ public class WorkerActivity extends AppCompatActivity {
             request.setHeader("Accept", "application/json");
             request.setHeader("Content-type", "application/json");
 
-            String insp_id = pref.GetPreferences("UserId");
-
             // Build JSON string
             JSONStringer userJson = null;
             try {
@@ -566,6 +826,8 @@ public class WorkerActivity extends AppCompatActivity {
                         .key("TaskId").value(selected_task_id)
                         .key("SubTaskName").value(name_st)
                         .key("Description").value(desc)
+                        .key("CreatedDateStr").value(current_time)
+                        .key("ModifiedDateStr").value(current_time)
                         .key("TaskOrder").value(order_st)
                         .key("StatusId").value("1")
                         .key("PriorityId").value(priority)
@@ -596,6 +858,19 @@ public class WorkerActivity extends AppCompatActivity {
                 ResponseHandler<String> responseHandler = new BasicResponseHandler();
                 String response = httpClient.execute(request, responseHandler);
                 Log.d("res", response);
+
+                if (response != null) {
+
+                    try {
+
+                        //Get Data from Json
+                        JSONObject jsonObject = new JSONObject(response);
+                        new_subTaskId = jsonObject.getString("NewSubTaskResult");
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -611,8 +886,7 @@ public class WorkerActivity extends AppCompatActivity {
                 pDialog.dismiss();
 
             //Show new Subtask List
-            new GetSubTaskList().execute("User");
-
+            new PostHistory().execute("Created");
         }
     }
 
@@ -640,7 +914,7 @@ public class WorkerActivity extends AppCompatActivity {
             if (convertView == null) {
 
                 //inflate the custom layout
-                convertView = inflater.from(parent.getContext()).inflate(R.layout.task_list_new, parent, false);
+                convertView = inflater.from(parent.getContext()).inflate(R.layout.task_list, parent, false);
                 viewHolder = new ViewHolder();
 
                 //cache the views
@@ -723,7 +997,7 @@ public class WorkerActivity extends AppCompatActivity {
                             .key("AssignedToId").value(worker_id)
                             .key("AssignedById").value(0)
                             .key("IsSubTask").value(1)
-                            .key("StatusId").value(0)
+                            .key("StatusId").value(1)
                             .endObject()
                             .endObject();
                 } catch (JSONException e) {
@@ -890,12 +1164,29 @@ public class WorkerActivity extends AppCompatActivity {
                         passing.add("1");
                         passing.add(comments);
                         passing.add(createdBy);
-                        new AssignTask().execute(passing);
+                        if (isNetworkAvailable()) {
+                            new AssignTask().execute(passing);
+                        } else {
+                            Toast.makeText(WorkerActivity.this, "No Internet Connection. Data stored locally", Toast.LENGTH_SHORT).show();
+                            SQLite entry = new SQLite(WorkerActivity.this);
+                            entry.open();
+                            entry.createEntryAssigned(id, worker_id, createdBy, "1", "1", comments, createdBy);
+                            String a = entry.getCountAssigned();
+                            entry.close();
+                            Log.d("Assigned Count :", a);
+                        }
                     }
                 });
                 builderSingle.show();
             }
         }
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     private void updateLabelStart() {
@@ -921,35 +1212,252 @@ public class WorkerActivity extends AppCompatActivity {
         list.setEmptyView(empty);
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
+    private class CustomAdapterNot extends ArrayAdapter<HashMap<String, Object>> {
 
+        public CustomAdapterNot(Context context, int textViewResourceId, ArrayList<HashMap<String, Object>> Strings) {
+
+            //let android do the initializing :)
+            super(context, textViewResourceId, Strings);
+        }
+
+        //class for caching the views in a row
+        private class ViewHolder {
+
+            TextView not, isRead, byName, taskName;
+            LinearLayout noti_linear;
+        }
+
+        //Initialise
+        ViewHolder viewHolder;
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+
+            if (convertView == null) {
+
+                //inflate the custom layout
+                convertView = inflater.from(parent.getContext()).inflate(R.layout.notification_layout, parent, false);
+                viewHolder = new ViewHolder();
+
+                //cache the views
+                viewHolder.taskName = (TextView) convertView.findViewById(R.id.noti_task);
+                viewHolder.byName = (TextView) convertView.findViewById(R.id.noti_by);
+                viewHolder.noti_linear = (LinearLayout) convertView.findViewById(R.id.not_layout);
+                viewHolder.not = (TextView) convertView.findViewById(R.id.textview_noti);
+                viewHolder.isRead = (TextView) convertView.findViewById(R.id.textview_isRead);
+
+                //link the cached views to the convertview
+                convertView.setTag(viewHolder);
+            } else
+                viewHolder = (ViewHolder) convertView.getTag();
+
+            //set the data to be displayed
+            viewHolder.byName.setText(notiList.get(position).get("UserName").toString());
+            viewHolder.taskName.setText(notiList.get(position).get("TaskName").toString());
+            viewHolder.not.setText(notiList.get(position).get("Description").toString());
+            viewHolder.noti_linear.setBackgroundColor(Color.LTGRAY);
+
+//            for (int i = 0; i < savedList.size(); i++) {
+//                Log.d("Test Custom", String.valueOf(savedList.get(i)));
+//                if (position == savedList.get(i)) {
+//                    viewHolder.noti_linear.setBackgroundColor(Color.TRANSPARENT);
+//                } else {
+//                    viewHolder.noti_linear.setBackgroundColor(Color.LTGRAY);
+//                }
+//            }
+
+            return convertView;
+        }
+    }
+
+    private class GetNotiList extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            dataList.clear();
+            // Showing progress dialog
+            pDialogN = new ProgressDialog(WorkerActivity.this);
+            pDialogN.setMessage("Please wait...");
+            pDialogN.setCancelable(false);
+            pDialogN.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            String user_id = pref.GetPreferences("UserId");
+
+            // Creating service handler class instance
+            ServiceHandler sh = new ServiceHandler();
+            String url = getString(R.string.url) + "EagleXpetizeService.svc/Notifications/" + user_id + "/1";
+            // Making a request to url and getting response
+            String jsonStr = sh.makeServiceCall(url, ServiceHandler.GET);
+            Log.d("Url", url);
+            Log.d("Response: ", "> " + jsonStr);
+            if (jsonStr != null) {
+
+                try {
+
+                    JSONArray tasks = new JSONArray(jsonStr);
+
+                    for (int i = 0; i < tasks.length(); i++) {
+                        JSONObject c = tasks.getJSONObject(i);
+
+                        String id = c.getString("TaskId");
+                        String username = c.getString("UserName");
+                        String taskName = c.getString("TaskName");
+                        String description = c.getString("Description");
+                        String byId = c.getString("ById");
+                        String toId = c.getString("ToId");
+                        String isNew = c.getString("IsNew");
+
+                        // adding each child node to HashMap key => value
+                        HashMap<String, Object> taskMap = new HashMap<String, Object>();
+                        taskMap.put("TaskId", id);
+                        taskMap.put("UserName", username);
+                        taskMap.put("TaskName", taskName);
+                        taskMap.put("Description", description);
+                        taskMap.put("ById", byId);
+                        taskMap.put("ToId", toId);
+                        taskMap.put("IsNew", isNew);
+                        notiList.add(taskMap);
+                        popupList.add(description);
+
+                    }
+                    count = notiList.size();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Log.e("ServiceHandler", "Couldn't get any data from the url");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (pDialogN.isShowing())
+                pDialogN.dismiss();
+
+            // initialize pop up window
+            menuItem.setIcon(buildCounterDrawable(count, R.drawable.blue_bell_small));
+            CustomAdapterNot notAdapter = new CustomAdapterNot(WorkerActivity.this, R.layout.popup_layout, notiList);
+            hidden_not.setAdapter(notAdapter);
+        }
+    }
+
+    public static String getCurrentTimeStamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date now = new Date();
+        String strDate = sdf.format(now);
+        return strDate;
+    }
+
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        super.onCreateOptionsMenu(menu);
         //inflate menu
         getMenuInflater().inflate(R.menu.menu_my, menu);
 
-        // Get the notifications MenuItem and LayerDrawable (layer-list)
-        MenuItem item_noti = menu.findItem(R.id.action_noti);
-        MenuItem item_logOut = menu.findItem(R.id.action_logOut);
-
-        item_logOut.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        menuItem = menu.findItem(R.id.testAction);
+        menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
 
-
+                if (hidden_not.getVisibility() == View.VISIBLE) {
+                    hidden_not.setVisibility(View.GONE);
+                } else {
+                    hidden_not.setVisibility(View.VISIBLE);
+                }
                 return false;
             }
         });
 
-        item_noti.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-
-                Intent i = new Intent(WorkerActivity.this, NotificationActivity.class);
-                startActivity(i);
-                return false;
-            }
-        });
+//        MenuItem item = menu.findItem(R.id.badge);
+//        MenuItemCompat.setActionView(item, R.layout.feed_update_count);
+//        View view = MenuItemCompat.getActionView(item);
+//        notifCount = (Button)view.findViewById(R.id.notif_count);
+//        notifCount.setText(String.valueOf(mNotifCount));
+//
+//        // Get the notifications MenuItem and LayerDrawable (layer-list)
+////        MenuItem item_noti = menu.findItem(R.id.action_noti);
+//        MenuItem item_logOut = menu.findItem(R.id.action_logOut);
+//
+//        item_logOut.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//
+//
+//                return false;
+//            }
+//        });
+//
+////        item_noti.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+////            @Override
+////            public boolean onMenuItemClick(MenuItem item) {
+////
+////                Intent i = new Intent(DashboardActivity.this, NotificationActivity.class);
+////                startActivity(i);
+////                return false;
+////            }
+////        });
 
         return true;
+    }
+
+    private Drawable buildCounterDrawable(int count, int backgroundImageId) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.counter_menuitem_layout, null);
+        view.setBackgroundResource(backgroundImageId);
+
+        if (count == 0) {
+            View counterTextPanel = view.findViewById(R.id.rel_panel);
+            counterTextPanel.setVisibility(View.GONE);
+        } else {
+            TextView textView = (TextView) view.findViewById(R.id.count);
+            textView.setText("" + count);
+        }
+
+        view.measure(
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+
+        view.setDrawingCacheEnabled(true);
+        view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
+        view.setDrawingCacheEnabled(false);
+
+        return new BitmapDrawable(getResources(), bitmap);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        super.finish();
+    }
+    public void changeLang(String lang) {
+
+        if (lang.equalsIgnoreCase(""))
+            return;
+        Locale myLocale = new Locale(lang);
+//        saveLocale(lang);
+        Locale.setDefault(myLocale);
+        android.content.res.Configuration config = new android.content.res.Configuration();
+        config.locale = myLocale;
+        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+        updateTexts();
+    }
+
+    private void updateTexts() {
+
+        Intent i = new Intent(WorkerActivity.this, WorkerActivity.class);
+        startActivity(i);
     }
 
 }

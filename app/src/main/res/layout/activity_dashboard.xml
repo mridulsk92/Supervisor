@@ -61,7 +61,7 @@
         android:layout_below="@+id/imageButton_inspectors"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="2dp"
-        android:text="Inspectors"
+        android:text="@string/Inspector"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ImageButton
@@ -82,7 +82,7 @@
         android:layout_alignLeft="@+id/textView2"
         android:layout_alignStart="@+id/textView2"
         android:layout_below="@+id/imageButton_approval"
-        android:text="Approve / Reject"
+        android:text="@string/ApproveReject"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ImageButton
@@ -102,7 +102,17 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_below="@+id/imageButton_workers"
-        android:text="Workers"
+        android:text="@string/Operator"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ListView
+        android:layout_width="170dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView_hidden_notification"
+        android:visibility="gone"
+        android:background="@color/white"
+        android:layout_alignTop="@+id/imageButton_inspectors"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

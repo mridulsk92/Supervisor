@@ -41,7 +41,9 @@
         <activity android:name=".WorkerListActivity" />
         <activity android:name=".DashboardActivity" />
         <activity android:name=".TaskDetailsActivity" />
-        <activity android:name=".ApprovalActivity"></activity>
+        <activity android:name=".ApprovalActivity" />
+        <activity android:name=".ApprovalDetailsActivity" />
+        <activity android:name=".SubTaskDetailsActivity"></activity>
     </application>
 
 </manifest>

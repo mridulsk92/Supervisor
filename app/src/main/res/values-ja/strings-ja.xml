@@ -1,0 +1,72 @@
+<resources>
+
+    <string name="app_name">Inspector</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <!--<string name="url">http://10.0.2.2/EagleXpetize/</string>-->
+    <string name="url">http://vikray.in/</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="lbl_recording">Recording...</string>
+
+    <string name="Inspector">検査官</string>
+    <string name="Name">名前</string>
+    <string name="Description">説明</string>
+    <string name="Comments">コメント</string>
+    <string name="AssignedTo">に割り当てられた</string>
+    <string name="Approve">承認</string>
+    <string name="Reject">リジェクト</string>
+    <string name="Operators">オペレーター</string>
+    <string name="MyTasks">私のタスク</string>
+    <string name="ApproveReject">承認・リジェクト</string>
+    <string name="SubName">サブタスク名</string>
+    <string name="Status">ステータス</string>
+    <string name="AssignedBy">Assigned By :</string>
+    <string name="Record">レコード</string>
+    <string name="Play">プレー</string>
+    <string name="Send">送信</string>
+    <string name="Priority">Priority</string>
+    <string name="Operator">オペレーター</string>
+    <string name="SubTaskName">サブタスク名</string>
+    <string name="SelectTask">タスクを選択する</string>
+    <string name="StartDate">Start Date</string>
+    <string name="EndDate">End Date</string>
+    <string name="Order">オーダー</string>
+    <string name="Add">追加</string>
+    <string name="TypeComments">このにコメントを入力．．</string>
+    <string name="HighPriority">High Priority</string>
+    <string name="MediumPriority">Medium Priority</string>
+    <string name="LowPriority">Low Prority</string>
+    <string name="ReAssign">に再割り当てられた</string>
+    <string name="TaskName">TaskName</string>
+    <string name="Language">言語</string>
+
+    <string name="TypeComment">このにコメントを入力</string>
+
+
+
+    <string name="pDialog_wait">お待ちください</string>
+    <string name="LoginSuccess">ログイン成功</string>
+    <string name="LoginFailed">ユーザー名とパスワードを確認してください</string>
+    <string name="TitleWorker">オペレーター</string>
+    <string name="About">について</string>
+    <string name="LogOut">ログアウト</string>
+    <string name="GPNotEnabled">Googleがインストールされていないサービスを再生/このデバイスで有効になって！</string>
+    <string name="GPNotSupported">このデバイスは、 Google Playのサービスのためにサポートしていません！</string>
+    <string name="DownloadComplete">ダウンロード完了</string>
+    <string name="CaptureCancelled">ユーザーはイメージキャプチャをキャンセルしました</string>
+    <string name="CaptureFailed">イメージキャプチャに失敗しました</string>
+    <string name="NotCompleted">まだ終わってない</string>
+    <string name="NoConnection">インターネット接続が見つかりませんでした。データはローカルに保存されます</string>
+    <string name="Success">成功</string>
+    <string name="Failed">失敗しました</string>
+
+    <string name="username">ユーザー名</string>
+    <string name="password">パスワード</string>
+    <string name="Login">ログイン</string>
+    <string name="Loading">ロード中</string>
+    <string name="Submit">OK</string>
+    <string name="Attachments">添付ファイル</string>
+    <string name="CommentBox">このにコメントを入力</string>
+
+
+</resources>

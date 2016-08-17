@@ -62,9 +62,9 @@
             android:id="@+id/listView_task"
             android:layout_width="wrap_content"
             android:layout_height="200dp"
+            android:layout_above="@+id/fab"
             android:layout_below="@+id/textView_inspector"
-            android:layout_centerHorizontal="true"
-            android:layout_alignBottom="@+id/fab" />
+            android:layout_centerHorizontal="true" />
 
         <TextView
             android:id="@+id/empty"
@@ -81,13 +81,22 @@
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:fabSize="mini"
-            android:scaleType="center"
+            android:layout_alignEnd="@+id/listView_task"
+            android:layout_alignParentBottom="true"
+            android:layout_alignRight="@+id/listView_task"
             android:layout_gravity="bottom|end"
             android:background="@null"
             android:src="@android:drawable/ic_input_add"
-            android:tint="@color/cardview_light_background"
-            android:layout_alignParentBottom="true"
+            android:tint="@color/cardview_light_background" />
+
+        <ListView
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/listView_hidden_notification"
+            android:visibility="gone"
+            android:background="@color/white"
+            android:layout_weight="1"
+            android:layout_alignTop="@+id/textView_inspector"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 

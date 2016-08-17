@@ -1,11 +1,13 @@
 package com.example.mridul_xpetize.supervisor;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
@@ -31,6 +33,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -59,6 +62,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -74,7 +78,7 @@ public class InspectorActivity extends AppCompatActivity {
     EditText startDate, endDate;
     ProgressDialog pDialog;
     int priority;
-    String insp_id;
+    String insp_id, isSubTask = "No";
     JSONArray tasks;
     PreferencesHelper pref;
     LayoutInflater inflater;
@@ -85,6 +89,7 @@ public class InspectorActivity extends AppCompatActivity {
 
     String user_id;
     ArrayList<HashMap<String, Object>> dataList;
+    SharedPreferences prefNew;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +101,7 @@ public class InspectorActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle("Supervisor");
 
+        prefNew = getSharedPreferences("LangPref", Activity.MODE_PRIVATE);
         pref = new PreferencesHelper(InspectorActivity.this);
         String acc_name = pref.GetPreferences("UserName");
         user_id = pref.GetPreferences("UserId");
@@ -108,17 +114,18 @@ public class InspectorActivity extends AppCompatActivity {
                         new ProfileDrawerItem().withName(acc_name).withEmail(acc_name + "@gmail.com").withIcon(getResources().getDrawable(R.drawable.profile))
                 ).build();
 
-        //Drawer
+        //Side Drawer contents
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withAccountHeader(headerResult)
                 .withToolbar(toolbar)
-                .withSelectedItem(-1)
                 .withTranslucentStatusBar(false)
+                .withSelectedItem(-1)
                 .withDisplayBelowStatusBar(true)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("About").withIcon(getResources().getDrawable(R.drawable.ic_about)).withIdentifier(1).withSelectable(false),
-                        new SecondaryDrawerItem().withName("Log Out").withIcon(getResources().getDrawable(R.drawable.ic_logout)).withIdentifier(2).withSelectable(false)
+                        new SecondaryDrawerItem().withName(R.string.About).withIcon(getResources().getDrawable(R.drawable.ic_about)).withSelectable(false),
+                        new PrimaryDrawerItem().withName(getString(R.string.Language)).withIcon(getResources().getDrawable(R.drawable.language_switch_ic)).withIdentifier(3).withSelectable(false),
+                        new SecondaryDrawerItem().withName(R.string.LogOut).withIcon(getResources().getDrawable(R.drawable.ic_logout)).withSelectable(false)
                 ).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -132,6 +139,52 @@ public class InspectorActivity extends AppCompatActivity {
 
                                 //Clicked LogOut
 
+                            } else if (drawerItem.getIdentifier() == 3) {
+
+                                SharedPreferences sp = getSharedPreferences("LangPref", Activity.MODE_PRIVATE);
+                                int selection = sp.getInt("LanguageSelect", -1);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(InspectorActivity.this);
+                                CharSequence[] array = {"English", "Japanese"};
+                                builder.setTitle("Select Language")
+                                        .setSingleChoiceItems(array, selection, new DialogInterface.OnClickListener() {
+
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                                if (which == 1) {
+                                                    String lang = "ja";
+                                                    pref.SavePreferences("Language", lang);
+                                                    SharedPreferences.Editor editor = prefNew.edit();
+                                                    editor.putInt("LanguageSelect", which);
+                                                    editor.commit();
+                                                    changeLang(lang);
+                                                } else {
+                                                    String lang = "en";
+                                                    pref.SavePreferences("Language", lang);
+                                                    SharedPreferences.Editor editor = prefNew.edit();
+                                                    editor.putInt("LanguageSelect", which);
+                                                    editor.commit();
+                                                    changeLang(lang);
+                                                }
+                                            }
+                                        })
+
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                // User clicked OK, so save the result somewhere
+
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int id) {
+
+                                            }
+                                        });
+
+                                builder.create();
+                                builder.show();
                             }
                         }
                         return false;
@@ -152,22 +205,64 @@ public class InspectorActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //Get TextView values and assign to String
-                String idTask = ((TextView) view.findViewById(R.id.task_id)).getText().toString();
-                String name = ((TextView) view.findViewById(R.id.taskname)).getText().toString();
-                String comments = ((TextView) view.findViewById(R.id.comments)).getText().toString();
-                String desc = ((TextView) view.findViewById(R.id.desc)).getText().toString();
-                String assignedBy = ((TextView) view.findViewById(R.id.assigned)).getText().toString();
-                String status = ((TextView) view.findViewById(R.id.status)).getText().toString();
+                if(isSubTask.equals("No")) {
+                    //Get TextView values and assign to String
+                    String idTask = ((TextView) view.findViewById(R.id.task_id)).getText().toString();
+                    String name = ((TextView) view.findViewById(R.id.taskname)).getText().toString();
+                    String comments = ((TextView) view.findViewById(R.id.comments)).getText().toString();
+                    String desc = ((TextView) view.findViewById(R.id.desc)).getText().toString();
+                    String assignedBy = ((TextView) view.findViewById(R.id.assigned)).getText().toString();
+                    String status = ((TextView) view.findViewById(R.id.status)).getText().toString();
 
-                Intent i = new Intent(InspectorActivity.this, TaskDetailsActivity.class);
-                i.putExtra("Id", idTask);
-                i.putExtra("Name", name);
-                i.putExtra("Status", status);
-                i.putExtra("Comments", comments);
-                i.putExtra("Description", desc);
-                i.putExtra("AssignedBy", assignedBy);
-                startActivity(i);
+                    Intent i = new Intent(InspectorActivity.this, TaskDetailsActivity.class);
+                    i.putExtra("Id", idTask);
+                    i.putExtra("Name", name);
+                    i.putExtra("Status", status);
+                    i.putExtra("Comments", comments);
+                    i.putExtra("Description", desc);
+                    i.putExtra("AssignedBy", assignedBy);
+                    startActivity(i);
+                }else{
+
+                    //Show SubTask details in dialog box
+                    String name_st = ((TextView) view.findViewById(R.id.subName)).getText().toString();
+                    String comments_st = ((TextView) view.findViewById(R.id.comments)).getText().toString();
+                    String desc_st = ((TextView) view.findViewById(R.id.desc)).getText().toString();
+                    String status_st = ((TextView) view.findViewById(R.id.statusId)).getText().toString();
+                    String assigned_st = ((TextView) view.findViewById(R.id.assignedBy)).getText().toString();
+
+                    LayoutInflater factory = LayoutInflater.from(InspectorActivity.this);
+                    final View addView = factory.inflate(
+                            R.layout.dialog_taskdetails, null);
+                    final AlertDialog detailDialog = new AlertDialog.Builder(InspectorActivity.this).create();
+                    detailDialog.setView(addView);
+
+                    //Initialise
+                    TextView subName = (TextView) addView.findViewById(R.id.view_subName);
+                    TextView desc = (TextView) addView.findViewById(R.id.view_description);
+                    TextView comments = (TextView) addView.findViewById(R.id.view_comments);
+                    TextView status = (TextView) addView.findViewById(R.id.view_status);
+                    TextView assigned = (TextView) addView.findViewById(R.id.view_assigned);
+                    ImageButton close = (ImageButton) addView.findViewById(R.id.imageButton_close);
+
+                    //SetTextValues
+                    subName.setText(name_st);
+                    desc.setText("Description : " + desc_st);
+                    comments.setText("Comments : " + comments_st);
+                    status.setText("Status : " + status_st);
+                    assigned.setText("Assigned By : " + assigned_st);
+
+                    //ok button onClick
+                    close.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            detailDialog.dismiss();
+                        }
+                    });
+
+                    detailDialog.show();
+                }
             }
         });
 
@@ -361,6 +456,7 @@ public class InspectorActivity extends AppCompatActivity {
             String createdBy_st = passed.get(2);
             String status_st = passed.get(3);
             String comments_st = passed.get(4);
+            String current_time = getCurrentTimeStamp();
 
             HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/AssignTask");
             request.setHeader("Accept", "application/json");
@@ -376,6 +472,7 @@ public class InspectorActivity extends AppCompatActivity {
                         .key("TaskId").value(taskid_st)
                         .key("AssignedToId").value(insp_id)
                         .key("AssignedById").value(createdBy_st)
+                        .key("AssignedDateStr").value(current_time)
                         .key("StatusId").value(status_st)
                         .key("IsSubTask").value(0)
                         .key("Comments").value(comments_st)
@@ -445,6 +542,7 @@ public class InspectorActivity extends AppCompatActivity {
             String loc = passed.get(2);
             String comments = passed.get(3);
             String createdBy = passed.get(4);
+            String current_time = getCurrentTimeStamp();
 
             HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/NewTask");
             request.setHeader("Accept", "application/json");
@@ -459,6 +557,8 @@ public class InspectorActivity extends AppCompatActivity {
                         .object()
                         .key("TaskName").value(name)
                         .key("Description").value(desc)
+                        .key("CreatedDateStr").value(current_time)
+                        .key("ModifiedDateStr").value(current_time)
                         .key("Location").value(loc)
                         .key("StatusId").value("1")
                         .key("Comments").value(comments)
@@ -787,6 +887,247 @@ public class InspectorActivity extends AppCompatActivity {
         endDate.setText(sdf.format(myCalendarE.getTime()));
     }
 
+    public static String getCurrentTimeStamp() {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date now = new Date();
+        String strDate = sdf.format(now);
+        return strDate;
+    }
+
+    private class CustomAdapterSub extends ArrayAdapter<HashMap<String, Object>> {
+
+        public CustomAdapterSub(Context context, int textViewResourceId, ArrayList<HashMap<String, Object>> Strings) {
+
+            //let android do the initializing :)
+            super(context, textViewResourceId, Strings);
+        }
+
+        //class for caching the views in a row
+        private class ViewHolder {
+
+            TextView comments, desc, priority, startdate, enddate, jobOrder, statusId, id, subId, createdBy, subName, isSub, detailsId, assignedBy;
+            CardView cv;
+        }
+
+        //Initialise
+        ViewHolder viewHolder;
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+
+            if (convertView == null) {
+
+                //inflate the custom layout
+                convertView = inflater.from(parent.getContext()).inflate(R.layout.sublist, parent, false);
+                viewHolder = new ViewHolder();
+
+                //cache the views
+                viewHolder.assignedBy = (TextView) convertView.findViewById(R.id.assignedBy);
+                viewHolder.detailsId = (TextView) convertView.findViewById(R.id.details_id);
+                viewHolder.subName = (TextView) convertView.findViewById(R.id.subName);
+                viewHolder.createdBy = (TextView) convertView.findViewById(R.id.createdBy);
+                viewHolder.subId = (TextView) convertView.findViewById(R.id.subtask_id);
+                viewHolder.comments = (TextView) convertView.findViewById(R.id.comments);
+                viewHolder.desc = (TextView) convertView.findViewById(R.id.desc);
+                viewHolder.isSub = (TextView) convertView.findViewById(R.id.isSub);
+                viewHolder.priority = (TextView) convertView.findViewById(R.id.priority);
+                viewHolder.startdate = (TextView) convertView.findViewById(R.id.start);
+                viewHolder.enddate = (TextView) convertView.findViewById(R.id.end);
+                viewHolder.jobOrder = (TextView) convertView.findViewById(R.id.jobOrder);
+                viewHolder.statusId = (TextView) convertView.findViewById(R.id.statusId);
+                viewHolder.id = (TextView) convertView.findViewById(R.id.task_id);
+
+                //link the cached views to the convertview
+                convertView.setTag(viewHolder);
+            } else
+                viewHolder = (ViewHolder) convertView.getTag();
+
+            //set the data to be displayed
+            viewHolder.assignedBy.setText(dataList.get(position).get("AssignedById").toString());
+            viewHolder.detailsId.setText(dataList.get(position).get("TaskDetailsId").toString());
+            viewHolder.subName.setText(dataList.get(position).get("TaskName").toString());
+            viewHolder.createdBy.setText(dataList.get(position).get("CreatedBy").toString());
+            viewHolder.comments.setText(dataList.get(position).get("Comments").toString());
+            viewHolder.desc.setText(dataList.get(position).get("TaskDescription").toString());
+//            viewHolder.priority.setText(dataList.get(position).get("Priority").toString());
+//            viewHolder.startdate.setText(dataList.get(position).get("TaskStartDate").toString());
+//            viewHolder.enddate.setText(dataList.get(position).get("TaskEndDate").toString());
+//            viewHolder.jobOrder.setText(dataList.get(position).get("JobOrder").toString());
+            viewHolder.isSub.setText(dataList.get(position).get("IsSub").toString());
+            viewHolder.statusId.setText(dataList.get(position).get("StatusId").toString());
+            viewHolder.id.setText(dataList.get(position).get("TaskId").toString());
+//            viewHolder.subId.setText(dataList.get(position).get("SubTaskId").toString());
+            return convertView;
+        }
+    }
+
+    private class GetTaskListSub extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            dataList.clear();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(InspectorActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... arg0) {
+
+
+            String selection = arg0[0];
+
+            HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/TaskAssigned");
+            request.setHeader("Accept", "application/json");
+            request.setHeader("Content-type", "application/json");
+
+            if (selection.equals("Approve")) {
+
+                // Build JSON string
+                JSONStringer userJson = null;
+                try {
+                    userJson = new JSONStringer()
+                            .object()
+                            .key("taskDetails")
+                            .object()
+                            .key("TaskDetailsId").value(0)
+                            .key("TaskId").value(0)
+                            .key("AssignedToId").value(0)
+                            .key("AssignedById").value(insp_id)
+                            .key("IsSubTask").value(1)
+                            .key("StatusId").value(7)
+                            .endObject()
+                            .endObject();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                Log.d("Json", String.valueOf(userJson));
+                StringEntity entity = null;
+                try {
+                    entity = new StringEntity(userJson.toString(), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+                entity.setContentType("application/json");
+
+                request.setEntity(entity);
+            }else{
+
+                // Build JSON string
+                JSONStringer userJson = null;
+                try {
+                    userJson = new JSONStringer()
+                            .object()
+                            .key("taskDetails")
+                            .object()
+                            .key("TaskDetailsId").value(0)
+                            .key("TaskId").value(0)
+                            .key("AssignedToId").value(0)
+                            .key("AssignedById").value(insp_id)
+                            .key("IsSubTask").value(1)
+                            .key("StatusId").value(6)
+                            .endObject()
+                            .endObject();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                Log.d("Json", String.valueOf(userJson));
+                StringEntity entity = null;
+                try {
+                    entity = new StringEntity(userJson.toString(), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+                entity.setContentType("application/json");
+
+                request.setEntity(entity);
+            }
+
+            // Send request to WCF service
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            try {
+                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+                String response = httpClient.execute(request, responseHandler);
+                Log.d("res", response);
+
+                if (response != null) {
+
+                    try {
+
+                        JSONObject json1 = new JSONObject(response);
+                        tasks = json1.getJSONArray("TaskAssignedResult");
+
+                        // Looping through Array
+                        for (int i = 0; i < tasks.length(); i++) {
+                            JSONObject c = tasks.getJSONObject(i);
+
+                            String id = c.getString("TaskId");
+                            String detailsId = c.getString("TaskDetailsId");
+                            String name = c.getString("TaskName");
+                            String desc = c.getString("TaskDescription");
+                            String comments = c.getString("Comments");
+                            String isSub = c.getString("IsSubTask");
+//                            String priority = c.getString("Priority");
+                            String createdBy = c.getString("CreatedBy");
+                            String assignedBy = c.getString("AssignedById");
+                            int statusId = c.getInt("StatusId");
+//                            int subId = c.getInt("SubTaskId");
+
+                            //adding each child node to HashMap key => value
+                            HashMap<String, Object> taskMap = new HashMap<String, Object>();
+                            taskMap.put("TaskDescription", desc);
+                            taskMap.put("TaskDetailsId", detailsId);
+                            taskMap.put("AssignedById", assignedBy);
+                            taskMap.put("CreatedBy", createdBy);
+                            taskMap.put("TaskId", id);
+                            taskMap.put("TaskName", name);
+                            taskMap.put("IsSub", isSub);
+//                            taskMap.put("SubTaskId", subId);
+                            taskMap.put("StatusId", statusId);
+                            taskMap.put("Comments", comments);
+//                            contact.put("Priority", "Priority : " + priority);
+
+                            dataList.add(taskMap);
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Log.e("ServiceHandler", "Couldn't get any data from the url");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return selection;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            CustomAdapterSub cardAdapter = new CustomAdapterSub(InspectorActivity.this, R.layout.sublist, dataList);
+            added_list.setAdapter(cardAdapter);
+
+        }
+    }
+
     @Override
     public void onContentChanged() {
         super.onContentChanged();
@@ -824,5 +1165,30 @@ public class InspectorActivity extends AppCompatActivity {
         });
 
         return true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        super.finish();
+    }
+
+    public void changeLang(String lang) {
+
+        if (lang.equalsIgnoreCase(""))
+            return;
+        Locale myLocale = new Locale(lang);
+//        saveLocale(lang);
+        Locale.setDefault(myLocale);
+        android.content.res.Configuration config = new android.content.res.Configuration();
+        config.locale = myLocale;
+        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+        updateTexts();
+    }
+
+    private void updateTexts() {
+
+        Intent i = new Intent(InspectorActivity.this, InspectorActivity.class);
+        startActivity(i);
     }
 }
