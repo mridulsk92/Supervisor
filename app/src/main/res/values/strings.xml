@@ -8,6 +8,7 @@
 
     <string name="Language">Language</string>
     <string name="lbl_recording">Recording...</string>
+    <string name="pDialog_wait">Please Wait..</string>
 
     <string name="About">About</string>
     <string name="LogOut">LogOut</string>
@@ -47,6 +48,8 @@
     <string name="ReAssign">Re-Assign To</string>
     <string name="TaskName">TaskName</string>
     <string name="Attachments">Attachments</string>
+    <string name="checkItemHint">Enter Check List Item here..</string>
+
 
     <string name="TypeComment">Type your comment here..</string>
 

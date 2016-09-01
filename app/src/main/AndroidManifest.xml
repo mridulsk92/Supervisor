@@ -43,7 +43,8 @@
         <activity android:name=".TaskDetailsActivity" />
         <activity android:name=".ApprovalActivity" />
         <activity android:name=".ApprovalDetailsActivity" />
-        <activity android:name=".SubTaskDetailsActivity"></activity>
+        <activity android:name=".SubTaskDetailsActivity"
+            android:windowSoftInputMode="adjustPan"></activity>
     </application>
 
 </manifest>

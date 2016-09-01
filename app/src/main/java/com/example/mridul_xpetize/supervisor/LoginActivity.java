@@ -96,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                                     editor.putInt("LanguageSelect", which);
                                     editor.commit();
                                     changeLang(lang);
-                                }else{
+                                } else {
                                     String lang = "en";
                                     pref.SavePreferences("Language", lang);
                                     SharedPreferences.Editor editor = prefNew.edit();
@@ -164,8 +164,8 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (message.equals("Success")) {
                         response = 200;
-                        pref.SavePreferences("UserId",id);
-                        pref.SavePreferences("UserName",name);
+                        pref.SavePreferences("UserId", id);
+                        pref.SavePreferences("UserName", name);
                     } else {
                         response = 201;
                     }

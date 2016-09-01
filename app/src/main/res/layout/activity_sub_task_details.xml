@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -48,9 +47,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/main"
-            android:layout_below="@id/toolbar"
-            android:layout_marginBottom="5dp"
-            card_view:contentPadding="6dp">
+            card_view:contentPadding="2dp">
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -65,7 +62,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
                     android:layout_margin="5dp"
-                    android:text="SubName"
+                    android:text="@string/SubName"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -79,7 +76,7 @@
                     android:layout_below="@+id/view_subName"
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="2dp"
-                    android:text="Comments"
+                    android:text="@string/Comments"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textSize="10sp" />
 
@@ -92,7 +89,7 @@
                     android:layout_below="@+id/view_comments"
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="2dp"
-                    android:text="Description"
+                    android:text="@string/Description"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textSize="10sp" />
 
@@ -105,7 +102,7 @@
                     android:layout_below="@+id/view_description"
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="2dp"
-                    android:text="Status"
+                    android:text="@string/Status"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textSize="10sp" />
 
@@ -118,7 +115,7 @@
                     android:layout_below="@+id/view_status"
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="2dp"
-                    android:text="AssignedByName"
+                    android:text="@string/AssignedBy"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textSize="10sp" />
 
@@ -128,48 +125,116 @@
         <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/record_card"
-            layout_height="fill_parent"
+            layout_height="wrap_content"
             layout_width="wrap_content"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_below="@id/task_details"
-            card_view:contentPadding="6dp">
+            android:layout_below="@id/task_details">
 
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:orientation="vertical">
 
-                <SeekBar
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:id="@+id/audioLayout"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/audioSeek"
-                    android:layout_marginTop="8dp"
-                    android:visibility="gone"
-                    android:layout_below="@+id/comments"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:indeterminate="false" />
+                    android:orientation="vertical">
 
-                <LinearLayout android:id="@+id/LinearLayout02" android:layout_height="wrap_content" android:layout_width="match_parent">
-                    <Button android:id="@+id/record_btn" android:text="@string/Record" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"></Button>
-                    <Button android:id="@+id/play_btn" android:text="@string/Play" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"></Button>
-                    <Button android:id="@+id/send_btn" android:text="@string/Send" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"></Button>
-                </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/LinearLayout02"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-                <Button
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Test"
-                    android:visibility="gone"
-                    android:id="@+id/button_test"
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true" />
+                        <Button
+                            android:id="@+id/record_btn"
+                            android:layout_width="0dp"
+                            android:layout_height="35dp"
+                            android:layout_weight="1"
+                            android:text="@string/Record"></Button>
 
+                        <Button
+                            android:id="@+id/play_btn"
+                            android:layout_width="0dp"
+                            android:layout_height="35dp"
+                            android:layout_weight="1"
+                            android:text="@string/Play"></Button>
+
+                        <Button
+                            android:id="@+id/send_btn"
+                            android:layout_width="0dp"
+                            android:layout_height="35dp"
+                            android:layout_weight="1"
+                            android:text="@string/Send"></Button>
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/checkListLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_below="@+id/audioLayout">
+
+                    <ListView
+                        android:id="@+id/listView_items"
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:layout_above="@+id/button_submitList"
+                        android:layout_alignParentLeft="true"
+                        android:dividerHeight="0dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_below="@+id/editText_itemText"
+                        android:visibility="gone" />
+
+                    <EditText
+                        android:id="@+id/editText_itemText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_toLeftOf="@+id/imageButton_itemAdd"
+                        android:background="@drawable/edittext_modified"
+                        android:hint="@string/checkItemHint"
+                        android:padding="3dp" />
+
+                    <ImageButton
+                        android:id="@+id/imageButton_itemAdd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentTop="true"
+                        android:background="@null"
+                        android:src="@drawable/add_ic" />
+
+                    <TextView
+                        android:id="@+id/empty"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_above="@+id/button_submitList"
+                        android:layout_alignEnd="@+id/imageButton_itemAdd"
+                        android:layout_alignRight="@+id/imageButton_itemAdd"
+                        android:layout_below="@+id/editText_itemText"
+                        android:gravity="center"
+                        android:text="No Items Added"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/button_submitList"
+                        android:layout_width="fill_parent"
+                        android:layout_height="35dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:text="@string/Submit" />
+
+                </RelativeLayout>
             </RelativeLayout>
         </android.support.v7.widget.CardView>
+
 
     </RelativeLayout>
 </RelativeLayout>
