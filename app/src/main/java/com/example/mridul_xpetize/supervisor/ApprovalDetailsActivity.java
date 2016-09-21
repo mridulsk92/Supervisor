@@ -591,7 +591,9 @@ public class ApprovalDetailsActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(String... params) {
 
+            String username = pref.GetPreferences("UserName");
             String status = params[0];
+            String noti_message = username + " has "+status+" the Task : "+name_st;
 
             HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/NewNotification");
             request.setHeader("Accept", "application/json");
@@ -604,7 +606,7 @@ public class ApprovalDetailsActivity extends AppCompatActivity {
                         .object()
                         .key("notification")
                         .object()
-                        .key("Description").value(status)
+                        .key("Description").value(noti_message)
                         .key("TaskId").value(id)
                         .key("ById").value(userId_st)
                         .key("ToId").value(assignedTo_st)

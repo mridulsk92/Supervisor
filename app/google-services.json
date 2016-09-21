@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "193637113157",
+    "firebase_url": "https://eaglexpetize.firebaseio.com",
+    "project_id": "eaglexpetize",
+    "storage_bucket": "eaglexpetize.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:193637113157:android:dd4117b0aba53b39",
+        "android_client_info": {
+          "package_name": "com.example.mridul_xpetize.supervisor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "193637113157-s5vg8k3casjbrv0phl6fs49dvi6eqgpl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6XQ13igOzC7V2gYbPeO-J78COtiwBc-0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

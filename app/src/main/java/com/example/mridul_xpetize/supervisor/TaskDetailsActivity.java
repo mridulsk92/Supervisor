@@ -504,136 +504,136 @@ public class TaskDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private class PostHistory extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Showing progress dialog
-            pDialog = new ProgressDialog(TaskDetailsActivity.this);
-            pDialog.setMessage("Please wait...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-
-            String historyDate = getCurrentTimeStamp();
-            String status = params[0];
-            String user_name = pref.GetPreferences("UserName");
-            String createdbyId = pref.GetPreferences("UserId");
-
-            HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/NewHistory");
-            request.setHeader("Accept", "application/json");
-            request.setHeader("Content-type", "application/json");
-
-            JSONStringer userJson = null;
-
-            if (status.equals("Assigned")) {
-                // Build JSON string
-                try {
-                    userJson = new JSONStringer()
-                            .object()
-                            .key("history")
-                            .object()
-                            .key("TaskId").value(taskId_history)
-                            .key("IsSubTask").value(1)
-                            .key("Notes").value("Assigned By : " + user_name)
-                            .key("Comments").value(status)
-//                        .key("HistoryDate").value(historyDate)
-//                        .key("CreatedDate").value(createdDate)
-                            .key("CreatedBy").value(super_id)
-                            .endObject()
-                            .endObject();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                // Build JSON string
-                try {
-                    userJson = new JSONStringer()
-                            .object()
-                            .key("history")
-                            .object()
-                            .key("TaskId").value(new_subTaskId)
-                            .key("IsSubTask").value(1)
-                            .key("Notes").value("Created By : " + user_name)
-                            .key("Comments").value(status)
-//                        .key("HistoryDate").value(historyDate)
-//                        .key("CreatedDate").value(createdDate)
-                            .key("CreatedBy").value(super_id)
-                            .endObject()
-                            .endObject();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            Log.d("Json", String.valueOf(userJson));
-
-            StringEntity entity = null;
-            try {
-                entity = new StringEntity(userJson.toString(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-
-            entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-            entity.setContentType("application/json");
-
-            request.setEntity(entity);
-
-            // Send request to WCF service
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            try {
-                ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                String response = httpClient.execute(request, responseHandler);
-
-                Log.d("res", response);
-
-                if (response != null) {
-
-                    try {
-
-                        //Get Data from Json
-                        JSONObject jsonObject = new JSONObject(response);
-
-                        String message = jsonObject.getString("NewHistoryResult");
-
-                        //Save userid and username if success
-                        if (message.equals("success")) {
-                            response_json = 200;
-                        } else {
-                            response_json = 201;
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-
-            if (response_json == 200) {
-                Toast.makeText(TaskDetailsActivity.this, "Success", Toast.LENGTH_SHORT).show();
-                new GetSubTaskList().execute("List");
-            } else {
-                Toast.makeText(TaskDetailsActivity.this, "Failed", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+//    private class PostHistory extends AsyncTask<String, Void, Void> {
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//            // Showing progress dialog
+//            pDialog = new ProgressDialog(TaskDetailsActivity.this);
+//            pDialog.setMessage("Please wait...");
+//            pDialog.setCancelable(false);
+//            pDialog.show();
+//        }
+//
+//        @Override
+//        protected Void doInBackground(String... params) {
+//
+//            String historyDate = getCurrentTimeStamp();
+//            String status = params[0];
+//            String user_name = pref.GetPreferences("UserName");
+//            String createdbyId = pref.GetPreferences("UserId");
+//
+//            HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/NewHistory");
+//            request.setHeader("Accept", "application/json");
+//            request.setHeader("Content-type", "application/json");
+//
+//            JSONStringer userJson = null;
+//
+//            if (status.equals("Assigned")) {
+//                // Build JSON string
+//                try {
+//                    userJson = new JSONStringer()
+//                            .object()
+//                            .key("history")
+//                            .object()
+//                            .key("TaskId").value(taskId_history)
+//                            .key("IsSubTask").value(1)
+//                            .key("Notes").value("Assigned By : " + user_name)
+//                            .key("Comments").value(status)
+////                        .key("HistoryDate").value(historyDate)
+////                        .key("CreatedDate").value(createdDate)
+//                            .key("CreatedBy").value(super_id)
+//                            .endObject()
+//                            .endObject();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            } else {
+//                // Build JSON string
+//                try {
+//                    userJson = new JSONStringer()
+//                            .object()
+//                            .key("history")
+//                            .object()
+//                            .key("TaskId").value(new_subTaskId)
+//                            .key("IsSubTask").value(1)
+//                            .key("Notes").value("Created By : " + user_name)
+//                            .key("Comments").value(status)
+////                        .key("HistoryDate").value(historyDate)
+////                        .key("CreatedDate").value(createdDate)
+//                            .key("CreatedBy").value(super_id)
+//                            .endObject()
+//                            .endObject();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            Log.d("Json", String.valueOf(userJson));
+//
+//            StringEntity entity = null;
+//            try {
+//                entity = new StringEntity(userJson.toString(), "UTF-8");
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
+//
+//            entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+//            entity.setContentType("application/json");
+//
+//            request.setEntity(entity);
+//
+//            // Send request to WCF service
+//            DefaultHttpClient httpClient = new DefaultHttpClient();
+//            try {
+//                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+//                String response = httpClient.execute(request, responseHandler);
+//
+//                Log.d("res", response);
+//
+//                if (response != null) {
+//
+//                    try {
+//
+//                        //Get Data from Json
+//                        JSONObject jsonObject = new JSONObject(response);
+//
+//                        String message = jsonObject.getString("NewHistoryResult");
+//
+//                        //Save userid and username if success
+//                        if (message.equals("success")) {
+//                            response_json = 200;
+//                        } else {
+//                            response_json = 201;
+//                        }
+//
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Void result) {
+//            super.onPostExecute(result);
+//            // Dismiss the progress dialog
+//            if (pDialog.isShowing())
+//                pDialog.dismiss();
+//
+//            if (response_json == 200) {
+//                Toast.makeText(TaskDetailsActivity.this, "Success", Toast.LENGTH_SHORT).show();
+//                new GetSubTaskList().execute("List");
+//            } else {
+//                Toast.makeText(TaskDetailsActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    }
 
     private class AssignTask extends AsyncTask<ArrayList<String>, Void, ArrayList<String>> {
 
@@ -660,11 +660,16 @@ public class TaskDetailsActivity extends AppCompatActivity {
             String insp_id = pref.GetPreferences("UserId");
             taskId_history = taskid_st;
 
+            String token = pref.GetPreferences("FCM TOKEN");
+            String userid = pref.GetPreferences("UserId");
+
+//            HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/AddToken");
+
             HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/AssignTask");
             request.setHeader("Accept", "application/json");
             request.setHeader("Content-type", "application/json");
 
-            // Build JSON string
+//            // Build JSON string
             JSONStringer userJson = null;
             try {
                 userJson = new JSONStringer()
@@ -683,6 +688,20 @@ public class TaskDetailsActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            // Build JSON string
+//            try {
+//                userJson = new JSONStringer()
+//                        .object()
+//                        .key("user")
+//                        .object()
+//                        .key("UserId").value(userid)
+//                        .key("token").value(token)
+//                        .endObject()
+//                        .endObject();
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
 
             Log.d("Json", String.valueOf(userJson));
             StringEntity entity = null;
@@ -716,7 +735,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
             if (pDialog.isShowing())
                 pDialog.dismiss();
 
-           new PostHistory().execute("Assigned");
+//           new PostHistory().execute("Assigned");
 
         }
     }
@@ -813,7 +832,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 pDialog.dismiss();
 
             //Show new Subtask List
-            new PostHistory().execute("Created");
+//            new PostHistory().execute("Created");
 
         }
     }

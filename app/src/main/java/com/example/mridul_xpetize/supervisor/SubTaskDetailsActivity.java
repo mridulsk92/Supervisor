@@ -221,7 +221,7 @@ public class SubTaskDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-//                        itemArrayList.clear();
+//                 itemArrayList.clear();
                 //Post List to server
                 new PostList().execute();
             }

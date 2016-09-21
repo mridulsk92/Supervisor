@@ -83,6 +83,8 @@ public class InspectorActivity extends AppCompatActivity {
     PreferencesHelper pref;
     LayoutInflater inflater;
     CustomAdapter cardAdapter;
+    int response_json;
+    String byId, taskId, nameTask;
 
     List<String> popupList = new ArrayList<String>();
     List<String> popupListId = new ArrayList<String>();
@@ -205,7 +207,7 @@ public class InspectorActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                if(isSubTask.equals("No")) {
+                if (isSubTask.equals("No")) {
                     //Get TextView values and assign to String
                     String idTask = ((TextView) view.findViewById(R.id.task_id)).getText().toString();
                     String name = ((TextView) view.findViewById(R.id.taskname)).getText().toString();
@@ -222,7 +224,7 @@ public class InspectorActivity extends AppCompatActivity {
                     i.putExtra("Description", desc);
                     i.putExtra("AssignedBy", assignedBy);
                     startActivity(i);
-                }else{
+                } else {
 
                     //Show SubTask details in dialog box
                     String name_st = ((TextView) view.findViewById(R.id.subName)).getText().toString();
@@ -452,8 +454,10 @@ public class InspectorActivity extends AppCompatActivity {
 
             ArrayList<String> passed = params[0]; //get passed arraylist
             String taskid_st = passed.get(0);
+            taskId = taskid_st;
             String userId_st = passed.get(1);
             String createdBy_st = passed.get(2);
+            byId = createdBy_st;
             String status_st = passed.get(3);
             String comments_st = passed.get(4);
             String current_time = getCurrentTimeStamp();
@@ -515,8 +519,114 @@ public class InspectorActivity extends AppCompatActivity {
             if (pDialog.isShowing())
                 pDialog.dismiss();
 
-            new GetTaskList().execute("User");
+            new PostNotification().execute("Assigned");
 
+        }
+    }
+
+    private class PostNotification extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            // Showing progress dialog
+            pDialog = new ProgressDialog(InspectorActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+
+            String username = pref.GetPreferences("UserName");
+            String status = params[0];
+            String noti_message = username + " has " + status + " the Task : " + nameTask;
+
+            HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/NewNotification");
+            request.setHeader("Accept", "application/json");
+            request.setHeader("Content-type", "application/json");
+
+            JSONStringer userJson = null;
+            // Build JSON string
+            try {
+                userJson = new JSONStringer()
+                        .object()
+                        .key("notification")
+                        .object()
+                        .key("Description").value(noti_message)
+                        .key("TaskId").value(taskId)
+                        .key("ById").value(byId)
+                        .key("ToId").value(insp_id)
+                        .key("CreatedBy").value(byId)
+                        .endObject()
+                        .endObject();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.d("Json", String.valueOf(userJson));
+
+            StringEntity entity = null;
+            try {
+                entity = new StringEntity(userJson.toString(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+            entity.setContentType("application/json");
+
+            request.setEntity(entity);
+
+            // Send request to WCF service
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            try {
+                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+                String response = httpClient.execute(request, responseHandler);
+
+                Log.d("res", response);
+
+                if (response != null) {
+
+                    try {
+
+                        //Get Data from Json
+                        JSONObject jsonObject = new JSONObject(response);
+
+                        String message = jsonObject.getString("NewNotificationResult");
+
+                        //Save userid and username if success
+                        if (message.equals("success")) {
+                            response_json = 200;
+                        } else {
+                            response_json = 201;
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            if (response_json == 200) {
+                new GetTaskList().execute("User");
+            } else {
+                Toast.makeText(InspectorActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                new GetTaskList().execute("User");
+            }
         }
     }
 
@@ -539,6 +649,7 @@ public class InspectorActivity extends AppCompatActivity {
             ArrayList<String> passed = passing[0]; //get passed arraylist
             String desc = passed.get(0);
             String name = passed.get(1);
+            nameTask = name;
             String loc = passed.get(2);
             String comments = passed.get(3);
             String createdBy = passed.get(4);
@@ -802,7 +913,7 @@ public class InspectorActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String id = dataList.get(which).get("TaskId").toString();
-//                        String statusId = dataList.get(which).get("StatusId").toString();
+                        nameTask = dataList.get(which).get("TaskName").toString();
                         String comments = dataList.get(which).get("Comments").toString();
                         String createdBy = dataList.get(which).get("CreatedBy").toString();
                         ArrayList<String> passing = new ArrayList<String>();
@@ -1019,7 +1130,7 @@ public class InspectorActivity extends AppCompatActivity {
                 entity.setContentType("application/json");
 
                 request.setEntity(entity);
-            }else{
+            } else {
 
                 // Build JSON string
                 JSONStringer userJson = null;
