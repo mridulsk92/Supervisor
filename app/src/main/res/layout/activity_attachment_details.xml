@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp"
+    tools:context="com.example.mridul_xpetize.test.AttachmentDetailsActivity">
+
+    <RelativeLayout
+        android:id="@+id/audioLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editText_comments"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/LinearLayout02"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/record_btn"
+                android:layout_width="0dp"
+                android:layout_height="35dp"
+                android:layout_weight="1"
+                android:text="@string/Record"></Button>
+
+            <Button
+                android:id="@+id/play_btn"
+                android:layout_width="0dp"
+                android:layout_height="35dp"
+                android:layout_weight="1"
+                android:text="@string/Play"></Button>
+
+            <Button
+                android:id="@+id/send_btn"
+                android:layout_width="0dp"
+                android:layout_height="35dp"
+                android:layout_weight="1"
+                android:text="Add"></Button>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/checkListLayout"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/audioLayout"
+        android:layout_above="@+id/button_add">
+
+        <ListView
+            android:id="@+id/listView_items"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_above="@+id/button_submitList"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editText_itemText"
+            android:dividerHeight="0dp"
+            android:visibility="gone" />
+
+        <EditText
+            android:id="@+id/editText_itemText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_toLeftOf="@+id/imageButton_itemAdd"
+            android:background="@drawable/edittext_modified"
+            android:hint="@string/checkItemHint"
+            android:padding="3dp" />
+
+        <ImageButton
+            android:id="@+id/imageButton_itemAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@null"
+            android:src="@drawable/add_ic" />
+
+        <TextView
+            android:id="@+id/empty"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_above="@+id/button_submitList"
+            android:layout_alignEnd="@+id/imageButton_itemAdd"
+            android:layout_alignRight="@+id/imageButton_itemAdd"
+            android:layout_below="@+id/editText_itemText"
+            android:gravity="center"
+            android:text="No Items Added"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Add"
+        android:id="@+id/button_add"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

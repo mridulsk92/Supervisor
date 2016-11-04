@@ -241,8 +241,8 @@ public class ApprovalActivity extends AppCompatActivity {
                 menuItem.setIcon(buildCounterDrawable(count, R.drawable.blue_bell_small));
 
                 parent.getChildAt(position).setBackgroundColor(Color.TRANSPARENT);
-                String desc = ((TextView) view.findViewById(R.id.textview_noti)).getText().toString();
-                String byId = ((TextView) view.findViewById(R.id.noti_by)).getText().toString();
+//                String desc = ((TextView) view.findViewById(R.id.textview_noti)).getText().toString();
+//                String byId = ((TextView) view.findViewById(R.id.noti_by)).getText().toString();
 //                Intent i = new Intent(ApprovalActivity.this, NotificationActivity.class);
 //                i.putExtra("Description", desc);
 //                i.putExtra("ById", byId);
@@ -252,7 +252,7 @@ public class ApprovalActivity extends AppCompatActivity {
 
         new GetSubTaskList().execute();
 
-        new GetNotification().execute();
+//        new GetNotification().execute();
     }
 
     private class GetNotification extends AsyncTask<Void, Void, Void>{
@@ -346,7 +346,7 @@ public class ApprovalActivity extends AppCompatActivity {
         //class for caching the views in a row
         private class ViewHolder {
 
-            TextView not, isRead, byName, taskName;
+            TextView desc, intent, read, rowId;
             LinearLayout noti_linear;
         }
 
@@ -363,11 +363,11 @@ public class ApprovalActivity extends AppCompatActivity {
                 viewHolder = new ViewHolder();
 
                 //cache the views
-                viewHolder.taskName = (TextView) convertView.findViewById(R.id.noti_task);
-                viewHolder.byName = (TextView) convertView.findViewById(R.id.noti_by);
+                viewHolder.rowId = (TextView) convertView.findViewById(R.id.rowId_notification);
+                viewHolder.desc = (TextView) convertView.findViewById(R.id.description_notification);
                 viewHolder.noti_linear = (LinearLayout) convertView.findViewById(R.id.not_layout);
-                viewHolder.not = (TextView) convertView.findViewById(R.id.textview_noti);
-                viewHolder.isRead = (TextView) convertView.findViewById(R.id.textview_isRead);
+                viewHolder.intent = (TextView) convertView.findViewById(R.id.intent_notification);
+                viewHolder.read = (TextView) convertView.findViewById(R.id.read_notification);
 
                 //link the cached views to the convertview
                 convertView.setTag(viewHolder);
@@ -375,11 +375,17 @@ public class ApprovalActivity extends AppCompatActivity {
                 viewHolder = (ViewHolder) convertView.getTag();
 
             //set the data to be displayed
-            viewHolder.byName.setText(notiList.get(position).get("UserName").toString());
-            viewHolder.taskName.setText(notiList.get(position).get("TaskName").toString());
-            viewHolder.not.setText(notiList.get(position).get("Description").toString());
+            viewHolder.rowId.setText(notiList.get(position).get("RowId").toString());
+            viewHolder.read.setText(notiList.get(position).get("Read").toString());
+            viewHolder.intent.setText(notiList.get(position).get("Intent").toString());
+            viewHolder.desc.setText(notiList.get(position).get("Description").toString());
             viewHolder.noti_linear.setBackgroundColor(Color.LTGRAY);
 
+            if (viewHolder.read.getText().equals("No")) {
+                viewHolder.noti_linear.setBackgroundColor(Color.LTGRAY);
+            } else {
+                viewHolder.noti_linear.setBackgroundColor(Color.TRANSPARENT);
+            }
 //            for (int i = 0; i < savedList.size(); i++) {
 //                Log.d("Test Custom", String.valueOf(savedList.get(i)));
 //                if (position == savedList.get(i)) {

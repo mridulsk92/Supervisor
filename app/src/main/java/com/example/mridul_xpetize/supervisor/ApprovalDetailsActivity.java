@@ -284,16 +284,16 @@ public class ApprovalDetailsActivity extends AppCompatActivity {
                     new PostTask().execute("Reject");
                 } else {
                     Toast.makeText(ApprovalDetailsActivity.this, "No Internet Connection. Data stored locally", Toast.LENGTH_SHORT).show();
-                    SQLite entry = new SQLite(ApprovalDetailsActivity.this);
-                    entry.open();
-                    entry.createEntry(detail_id, id, assignedTo_st, tempStart, tempEnd, currentTime, assignedBy, "6", "1", comments_updated, createdBy);
-                    entry.createEntryNotification("Rejected", id, userId_st, assignedTo_st, userId_st);
-                    entry.createEntryAssigned(id, assignedTo_st, assignedBy, "1", "1", comments_updated, createdBy);
-                    String c = entry.getCount();
-                    String n = entry.getCountNotification();
-                    String a = entry.getCountAssigned();
-                    entry.close();
-                    Log.d("Count", "Task :" + c + "Notification :" + n + "Assigned :" + a);
+//                    SQLite entry = new SQLite(ApprovalDetailsActivity.this);
+//                    entry.open();
+//                    entry.createEntry(detail_id, id, assignedTo_st, tempStart, tempEnd, currentTime, assignedBy, "6", "1", comments_updated, createdBy);
+//                    entry.createEntryNotification("Rejected", id, userId_st, assignedTo_st, userId_st);
+//                    entry.createEntryAssigned(id, assignedTo_st, assignedBy, "1", "1", comments_updated, createdBy);
+//                    String c = entry.getCount();
+//                    String n = entry.getCountNotification();
+//                    String a = entry.getCountAssigned();
+//                    entry.close();
+//                    Log.d("Count", "Task :" + c + "Notification :" + n + "Assigned :" + a);
                 }
             }
         });
@@ -328,14 +328,14 @@ public class ApprovalDetailsActivity extends AppCompatActivity {
                     new PostTask().execute(condition);
                 } else {
                     Toast.makeText(ApprovalDetailsActivity.this, "No Internet connection. Data stored locally", Toast.LENGTH_SHORT).show();
-                    SQLite entry = new SQLite(ApprovalDetailsActivity.this);
-                    entry.open();
-                    entry.createEntry(detail_id, id, assignedTo_st, tempStart, tempEnd, currentTime, assignedBy, "8", "1", comments_updated, createdBy);
-                    entry.createEntryNotification("Closed", id, userId_st, assignedTo_st, userId_st);
-                    String c = entry.getCount();
-                    String n = entry.getCountNotification();
-                    entry.close();
-                    Log.d("Count", "Task :" + c + "Notification :" + n);
+//                    SQLite entry = new SQLite(ApprovalDetailsActivity.this);
+//                    entry.open();
+//                    entry.createEntry(detail_id, id, assignedTo_st, tempStart, tempEnd, currentTime, assignedBy, "8", "1", comments_updated, createdBy);
+//                    entry.createEntryNotification("Closed", id, userId_st, assignedTo_st, userId_st);
+//                    String c = entry.getCount();
+//                    String n = entry.getCountNotification();
+//                    entry.close();
+//                    Log.d("Count", "Task :" + c + "Notification :" + n);
                 }
             }
         });

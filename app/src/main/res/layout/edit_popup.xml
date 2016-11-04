@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/edit_item"
+        android:layout_width="wrap_content"
+        android:hint="Enter Text"
+        android:background="@drawable/edittext_modified"
+        android:padding="5dp"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/button_edit_ok"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/button_edit_ok"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ok"
+        android:padding="5dp"
+        android:layout_alignBottom="@+id/edit_item"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+</RelativeLayout>

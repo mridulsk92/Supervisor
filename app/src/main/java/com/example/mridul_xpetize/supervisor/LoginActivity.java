@@ -166,6 +166,7 @@ public class LoginActivity extends AppCompatActivity {
                         response = 200;
                         pref.SavePreferences("UserId", id);
                         pref.SavePreferences("UserName", name);
+                        pref.SavePreferences("IsLoggedIn", "Yes");
                     } else {
                         response = 201;
                     }

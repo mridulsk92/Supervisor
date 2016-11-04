@@ -58,6 +58,10 @@
             </intent-filter>
         </service>
 
+        <activity android:name=".CreateSubTaskActivity" />
+        <activity android:name=".AttachmentDetailsActivity" />
+        <activity android:name=".ManageTemplateActivity"></activity>
+
     </application>
 
 </manifest>

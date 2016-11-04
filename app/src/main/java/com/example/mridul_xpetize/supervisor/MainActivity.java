@@ -213,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     public boolean onCreateOptionsMenu(Menu menu) {
 
         //inflate menu

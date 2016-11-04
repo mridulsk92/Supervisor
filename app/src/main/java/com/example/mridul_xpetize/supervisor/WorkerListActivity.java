@@ -266,7 +266,6 @@ public class WorkerListActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
 
-
                 return false;
             }
         });
