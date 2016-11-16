@@ -1,5 +1,6 @@
 package com.example.mridul_xpetize.supervisor;
 
+import android.app.Dialog;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -114,13 +116,76 @@ public class ManageTemplateActivity extends AppCompatActivity {
                 long reference = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
                 if (myDownloadReference == reference) {
                     // Do something with downloaded file.
-                    Toast.makeText(ManageTemplateActivity.this, getString(R.string.DownloadComplete), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ManageTemplateActivity.this, "Download Complete", Toast.LENGTH_SHORT).show();
                     message_view.setVisibility(View.GONE);
                     ManageAudio();
                 }
             }
         };
         registerReceiver(receiver, filter);
+
+        itemList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                final TextView currentItemText = (TextView) view.findViewById(R.id.textView_listItem);
+                final android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(ManageTemplateActivity.this);
+                final CharSequence items[] = {"Edit", "Delete"};
+                alertDialogBuilder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        if (which == 0) {
+
+                            //display edit popup
+                            final Dialog editDialog = new Dialog(ManageTemplateActivity.this);
+                            editDialog.setContentView(R.layout.edit_popup);
+                            editDialog.setTitle("Edit CheckList Item");
+                            final EditText editText_item = (EditText) editDialog.findViewById(R.id.edit_item);
+                            editText_item.setText(currentItemText.getText());
+                            Button btnOk = (Button) editDialog.findViewById(R.id.button_edit_ok);
+
+                            btnOk.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                    itemArrayList.set(position, editText_item.getText().toString());
+                                    dataList.get(position).put("ItemListString", editText_item.getText().toString());
+                                    checkAdapter = new CustomAdapter(ManageTemplateActivity.this, R.layout.checklist, dataList);
+                                    itemList.setAdapter(checkAdapter);
+                                    checkAdapter.notifyDataSetChanged();
+                                    editDialog.cancel();
+
+                                }
+                            });
+
+                            editDialog.show();
+                        } else {
+
+                            itemArrayList.remove(position);
+                            dataList.remove(position);
+                            checkAdapter = new CustomAdapter(ManageTemplateActivity.this, R.layout.checklist, dataList);
+                            itemList.setAdapter(checkAdapter);
+                            checkAdapter.notifyDataSetChanged();
+
+                        }
+                    }
+                });
+                alertDialogBuilder.setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1) {
+
+                            }
+                        });
+
+                android.support.v7.app.AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+
+                return false;
+            }
+        });
     }
 
     private void ManageAudio() {
@@ -241,6 +306,7 @@ public class ManageTemplateActivity extends AppCompatActivity {
         emptyDialog = (View) findViewById(R.id.empty);
         final EditText itemAddBox = (EditText) findViewById(R.id.editText_itemText);
         itemList = (ListView) findViewById(R.id.listView_items);
+        Button submitItems = (Button) findViewById(R.id.button_submitList);
 
         new GetCheckList().execute();
 
@@ -273,7 +339,7 @@ public class ManageTemplateActivity extends AppCompatActivity {
 
                     itemArrayList.add(new String(itemAddBox.getText().toString()));
                     itemListSend.add(new String(itemAddBox.getText().toString()));
-//                    itemList.setAdapter(new ArrayAdapter<String>(SubTaskDetailsActivity.this, android.R.layout.simple_list_item_1, itemArrayList));
+//                    itemList.setAdapter(new ArrayAdapter<String>(ManageTemplateActivity.this, android.R.layout.simple_list_item_1, itemArrayList));
                     checkAdapter = new CustomAdapter(ManageTemplateActivity.this, R.layout.checklist, dataList);
                     itemList.setAdapter(checkAdapter);
                     checkAdapter.notifyDataSetChanged();
@@ -282,8 +348,134 @@ public class ManageTemplateActivity extends AppCompatActivity {
                 }
             }
         });
+
+        //Submit List to server
+        submitItems.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+//                 itemArrayList.clear();
+                //Post List to server
+                new PostList().execute();
+            }
+        });
     }
 
+    private class PostList extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(ManageTemplateActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            HttpPost request = new HttpPost(getString(R.string.url) + "EagleXpetizeService.svc/NewCheckList");
+            request.setHeader("Accept", "application/json");
+            request.setHeader("Content-type", "application/json");
+
+            JSONObject listJson = new JSONObject();
+            JSONObject finalJson = new JSONObject();
+
+            View v;
+            TextView tv;
+            for (int i = 0; i < itemList.getCount(); i++) {
+                v = itemList.getChildAt(i);
+                tv = (TextView) v.findViewById(R.id.textView_listItem);
+                itemListSend.add(tv.getText().toString());
+            }
+
+            // Build JSON string
+            try {
+
+                JSONArray listArr = new JSONArray();
+                for (int i = 0; i < itemListSend.size(); i++) {
+                    listArr.put(itemListSend.get(i));
+                }
+
+                listJson.put("TaskId", sub_id);
+                listJson.put("IsSubTask", 1);
+                listJson.put("ItemList", listArr);
+                listJson.put("Checked", 0);
+                listJson.put("ModifiedBy", 1);
+                listJson.put("CreatedBy", 1);
+                finalJson.put("checklist", listJson);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.d("Json", String.valueOf(finalJson));
+
+            StringEntity entity = null;
+            try {
+                entity = new StringEntity(finalJson.toString(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            entity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+            entity.setContentType("application/json");
+
+            request.setEntity(entity);
+
+            // Send request to WCF service
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+
+            try {
+                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+                String response = httpClient.execute(request, responseHandler);
+
+                Log.d("res", response);
+
+                if (response != null) {
+
+                    try {
+                        //Get Data from Json
+                        JSONObject jsonObject = new JSONObject(response);
+
+                        String message = jsonObject.getString("NewCheckListResult");
+
+                        //Save UserId and UserName if success
+                        if (message.equals("success")) {
+                            response_json = 200;
+                        } else {
+                            response_json = 201;
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            //Dismiss Dialog if showing
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            if (response_json == 200) {
+                Toast.makeText(ManageTemplateActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                itemArrayList.clear();
+            } else {
+                Toast.makeText(ManageTemplateActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    
     private class PostAudio extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -453,7 +645,7 @@ public class ManageTemplateActivity extends AppCompatActivity {
             if (pDialog.isShowing())
                 pDialog.dismiss();
 
-//            itemList.setAdapter(new ArrayAdapter<String>(SubTaskDetailsActivity.this, android.R.layout.simple_list_item_1, itemArrayList));
+//            itemList.setAdapter(new ArrayAdapter<String>(ManageTemplateActivity.this, android.R.layout.simple_list_item_1, itemArrayList));
 
             checkAdapter = new CustomAdapter(ManageTemplateActivity.this, R.layout.checklist, dataList);
             itemList.setAdapter(checkAdapter);

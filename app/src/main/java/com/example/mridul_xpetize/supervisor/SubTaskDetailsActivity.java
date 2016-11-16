@@ -206,11 +206,13 @@ public class SubTaskDetailsActivity extends AppCompatActivity {
 
                             editDialog.show();
                         } else {
+
                             itemArrayList.remove(position);
                             dataList.remove(position);
                             checkAdapter = new CustomAdapter(SubTaskDetailsActivity.this, R.layout.checklist, dataList);
                             itemList.setAdapter(checkAdapter);
                             checkAdapter.notifyDataSetChanged();
+
                         }
                     }
                 });
@@ -568,7 +570,6 @@ public class SubTaskDetailsActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
 
             Log.d("Json", String.valueOf(userJson));
 

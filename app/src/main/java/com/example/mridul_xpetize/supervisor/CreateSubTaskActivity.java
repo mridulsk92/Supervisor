@@ -53,7 +53,6 @@ public class CreateSubTaskActivity extends AppCompatActivity {
     String selected_task, selected_task_id, taskId;
     PreferencesHelper pref;
 
-
     ProgressDialog pDialog;
     ArrayList<HashMap<String, Object>> dataList;
 
@@ -213,6 +212,7 @@ public class CreateSubTaskActivity extends AppCompatActivity {
                 try {
 
                     JSONArray tasks = new JSONArray(jsonStr);
+
                     // looping through All Tasks
                     for (int i = 0; i < tasks.length(); i++) {
                         JSONObject c = tasks.getJSONObject(i);
@@ -363,7 +363,7 @@ public class CreateSubTaskActivity extends AppCompatActivity {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(CreateSubTaskActivity.this);
                 alertDialog.setMessage("Do you want to add attachment now?");
 
-                // Setting Positive "Yes" Btn
+                //Setting Positive "Yes" Button
                 alertDialog.setPositiveButton("YES",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
@@ -374,7 +374,7 @@ public class CreateSubTaskActivity extends AppCompatActivity {
                             }
                         });
 
-                // Setting Negative "NO" Btn
+                //Setting Negative "No" Button
                 alertDialog.setNegativeButton("LATER",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {

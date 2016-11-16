@@ -114,7 +114,7 @@
         android:layout_height="fill_parent"
         android:layout_marginTop="2dp"
         android:layout_below="@+id/subTask_details"
-        android:layout_above="@+id/button_add">
+        android:layout_alignParentBottom="true">
 
         <ListView
             android:id="@+id/listView_items"
@@ -160,6 +160,13 @@
             android:text="No Items Added"
             android:visibility="gone" />
 
-    </RelativeLayout>
+        <Button
+            android:id="@+id/button_submitList"
+            android:layout_width="fill_parent"
+            android:layout_height="35dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/Submit" />
 
+    </RelativeLayout>
 </RelativeLayout>
