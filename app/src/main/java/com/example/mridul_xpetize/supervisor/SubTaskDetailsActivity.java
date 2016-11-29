@@ -159,6 +159,7 @@ public class SubTaskDetailsActivity extends AppCompatActivity {
 
                 File file = new File(Environment.getExternalStorageDirectory().getPath() + "/InspectorAudio/SubTask" + sub_id + ".mp3");
                 try {
+
                     audioByte = FileUtils.readFileToByteArray(file);
                     base64String = Base64.encodeToString(audioByte, 0);
                     new PostAudio().execute();
